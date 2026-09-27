@@ -40,7 +40,6 @@
   .nav-count{margin-left:auto;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--bg);padding:2px 8px;border-radius:8px;font-weight:600}
   .nav-item.active .nav-count{background:var(--accent-soft);color:var(--accent)}
 
-  /* Sync-индикатор */
   .sync-badge{
     display:flex;align-items:center;gap:8px;padding:8px 12px;margin:0 4px 12px;
     border-radius:var(--radius-sm);background:var(--surface);font-size:12px;
@@ -65,6 +64,7 @@
   .btn{background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:600;letter-spacing:-.005em;transition:all .2s cubic-bezier(.4,0,.2,1);white-space:nowrap;box-shadow:0 2px 8px rgba(74,144,194,.2)}
   .btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(74,144,194,.3)}
   .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important}
   .btn-orange{background:var(--orange);box-shadow:0 2px 8px rgba(232,145,90,.25)}
   .btn-orange:hover{background:var(--orange-hover);box-shadow:0 4px 14px rgba(232,145,90,.35)}
   .btn-ghost{background:var(--surface);border:1.5px solid var(--border);color:var(--text);box-shadow:none}
@@ -130,21 +130,6 @@
   .family-row .nm{color:var(--accent);font-weight:650;min-width:90px;font-size:13.5px}
   .family-row .full{color:var(--text-soft);flex:1;line-height:1.5}
 
-  .tree-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-  .tree-card{background:var(--surface);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow-sm);transition:all .25s;position:relative;cursor:zoom-in}
-  .tree-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
-  .tree-card img{width:100%;height:auto;border-radius:var(--radius-sm);display:block;background:var(--bg-alt)}
-  .tree-card .tree-title{font-size:14px;font-weight:600;margin-top:12px;text-align:center;color:var(--text)}
-  .tree-card .tree-actions{position:absolute;top:24px;right:24px;display:flex;gap:6px;opacity:0;transition:opacity .2s}
-  .tree-card:hover .tree-actions{opacity:1}
-  .tree-card .tree-actions button{background:rgba(255,255,255,.95);border:none;color:var(--text);padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;box-shadow:var(--shadow-sm)}
-  .tree-card .tree-actions button:hover{background:#fff;transform:scale(1.05)}
-
-  .drop-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:48px 24px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface);margin-bottom:24px}
-  .drop-zone:hover, .drop-zone.dragover{border-color:var(--accent);background:var(--accent-soft)}
-  .drop-zone .dz-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
-  .drop-zone .dz-sub{font-size:13.5px;color:var(--muted)}
-
   .matrix-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:12px 16px;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm)}
   .matrix-toolbar .label{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:4px}
   .matrix-toolbar .btn-sm{padding:6px 12px;font-size:12.5px}
@@ -175,8 +160,8 @@
   .matrix .cell:hover{outline:2.5px solid var(--accent);outline-offset:-2.5px;z-index:5;border-radius:6px}
   .matrix .cell.diag{background:repeating-linear-gradient(45deg,#f4f7fb,#f4f7fb 4px,#e8f0f8 4px,#e8f0f8 8px);cursor:default}
   body.theme-dark .matrix .cell.diag{background:repeating-linear-gradient(45deg,#1a2431,#1a2431 4px,#243342 4px,#243342 8px)}
-  .matrix .cell .letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#1e2a38;text-shadow:0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff}
-  .matrix .cell .letter.on-color{color:#fff;text-shadow:0 0 2px rgba(0,0,0,.6), 0 0 4px rgba(0,0,0,.4)}
+  .matrix .cell .letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#1e2a38}
+  .matrix .cell .letter.on-color{color:#fff}
   .matrix tr.hl th, .matrix tr.hl td{background-color:rgba(74,144,194,.08)}
   .matrix td.hl{background-color:rgba(74,144,194,.12) !important}
   .matrix thead th.hl{background-color:rgba(74,144,194,.16)}
@@ -213,12 +198,6 @@
   .empty{text-align:center;color:var(--muted);padding:64px 24px;font-size:14.5px;background:var(--surface);border-radius:var(--radius-md);border:1.5px dashed var(--border)}
   .divider{height:1px;background:var(--border);margin:24px 0}
 
-  .lightbox{position:fixed;inset:0;background:rgba(15,23,32,.92);z-index:200;display:none;justify-content:center;align-items:center;padding:24px;cursor:zoom-out}
-  .lightbox.active{display:flex;animation:fadeIn .2s}
-  .lightbox img{max-width:95vw;max-height:90vh;border-radius:var(--radius-md);box-shadow:var(--shadow-lg)}
-  .lightbox-close{position:absolute;top:20px;right:24px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:12px;cursor:pointer;transition:background .2s}
-  .lightbox-close:hover{background:rgba(255,255,255,.3)}
-
   @media (max-width: 700px){
     .sidebar{width:72px;padding:20px 8px}
     .logo{padding:0 0 16px;text-align:center;font-size:0}
@@ -232,7 +211,6 @@
     .modal-content{padding:22px;border-radius:24px}
     .matrix .cell{width:26px;height:26px}
     .card{padding:18px}
-    .tree-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -246,7 +224,6 @@
   </div>
   <div class="nav-item active" data-tab="chars"><span class="label">Персонажи</span><span class="nav-count" id="navChars">0</span></div>
   <div class="nav-item" data-tab="families"><span class="label">Семьи</span><span class="nav-count" id="navFam">0</span></div>
-  <div class="nav-item" data-tab="trees"><span class="label">Древо</span><span class="nav-count" id="navTrees">0</span></div>
   <div class="nav-item" data-tab="matrix"><span class="label">Матрица</span><span class="nav-count" id="navMatrix">0</span></div>
   <div class="nav-item" data-tab="fics"><span class="label">Зарисовки</span><span class="nav-count" id="navFics">0</span></div>
   <div class="nav-item" data-tab="stories"><span class="label">Аушки</span><span class="nav-count" id="navStories">0</span></div>
@@ -273,18 +250,6 @@
     <div id="familiesList"></div>
   </section>
 
-  <section class="panel" id="trees">
-    <div class="page-head">
-      <div><h1>Семейные древа</h1><div class="sub">Схемы родословных</div></div>
-    </div>
-    <div class="drop-zone" id="dropZone">
-      <div class="dz-title">Перетащи картинки сюда или нажми</div>
-      <div class="dz-sub">PNG, JPG — сохранятся в облаке</div>
-      <input type="file" id="treeInput" accept="image/*" multiple style="display:none">
-    </div>
-    <div class="tree-grid" id="treesGrid"></div>
-  </section>
-
   <section class="panel" id="matrix">
     <div class="page-head">
       <div><h1>Матрица отношений</h1><div class="sub">Смотреть сверху вниз: строка = чьё отношение, столбец = к кому</div></div>
@@ -298,6 +263,7 @@
       <button class="btn btn-ghost btn-sm zoom-btn" data-size="large">Крупный</button>
       <button class="btn btn-ghost btn-sm" onclick="fitMatrix()">Уместить на экране</button>
       <input id="matrixSearch" placeholder="Найти имя..." oninput="filterMatrix(this.value)">
+      <button class="btn btn-ghost btn-sm" onclick="openMatrixEditor()">Управлять списком</button>
     </div>
 
     <div class="picker-block">
@@ -527,10 +493,20 @@
   </div>
 </div></div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lightboxImg" src="" alt="">
-</div>
+<div class="modal" id="matrixEditModal"><div class="modal-content">
+  <h2>Управление списком матрицы</h2>
+  <div class="meta">Переставляй имена кнопками ↑↓, удаляй ненужные, добавляй новые. Данные в клетках сохранятся, если имя не менялось.</div>
+  <div id="matrixEditorList" style="margin-bottom:16px;max-height:50vh;overflow-y:auto;padding-right:4px"></div>
+  <button class="btn btn-ghost btn-sm" onclick="matrixAddRow()">+ Добавить имя</button>
+  <div class="divider"></div>
+  <div class="modal-actions" style="justify-content:space-between">
+    <button class="btn btn-ghost btn-danger" onclick="matrixResetCols()">Сбросить к исходному</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="closeModal('matrixEditModal')">Отмена</button>
+      <button class="btn" onclick="matrixSaveCols()">Сохранить</button>
+    </div>
+  </div>
+</div></div>
 
 <script>
 // ============================================
@@ -538,10 +514,10 @@
 // ============================================
 const FIREBASE_URL = "https://test-45b25-default-rtdb.firebaseio.com";
 const FB_PATH = "ugolok";
-const SYNC_INTERVAL = 3000; // проверка изменений раз в 3 секунды
+const SYNC_INTERVAL = 3000;
 
 // ============================================
-// ДАННЫЕ (дефолт — на случай чистой базы)
+// ДАННЫЕ
 // ============================================
 const DATA = {
   chars: [
@@ -713,18 +689,17 @@ const STORY_GROUPS = {
 // СОСТОЯНИЕ
 // ============================================
 const LS_KEY = "nash-ugolok-v3";
-const LS_MIGRATED = "nash-ugolok-migrated-to-fb"; // флаг, что уже залили в облако
+const LS_MIGRATED = "nash-ugolok-migrated-to-fb";
 
 let DB = {
   chars: [], families: [], watch: [], fics: [],
   matrix: {}, matrixCols: DATA.matrixCols.slice(),
-  trees: [], stories: []
+  stories: []
 };
 
-let _lastRemoteJSON = ""; // последняя полученная из облака версия (для сравнения)
-let _syncStatus = "loading"; // loading | on | syncing | off
+let _lastRemoteJSON = "";
+let _syncStatus = "loading";
 
-// Миграция старых историй group → groups
 function migrateStory(s){
   if(s.groups && Array.isArray(s.groups)) return s;
   const groups = s.group ? [s.group] : ['other'];
@@ -732,7 +707,6 @@ function migrateStory(s){
   return { ...rest, groups };
 }
 
-// Загрузка из localStorage (как временный кэш)
 function loadFromLocal(){
   const raw = localStorage.getItem(LS_KEY);
   if(raw){
@@ -745,7 +719,6 @@ function loadFromLocal(){
         fics: p.fics || JSON.parse(JSON.stringify(DATA.fics)),
         matrix: p.matrix || JSON.parse(JSON.stringify(DATA.matrix)),
         matrixCols: p.matrixCols || DATA.matrixCols.slice(),
-        trees: p.trees || [],
         stories: (p.stories ? p.stories.map(migrateStory) : JSON.parse(JSON.stringify(STORIES_DEFAULT)))
       };
     }catch(e){}
@@ -757,7 +730,6 @@ function loadFromLocal(){
     fics: JSON.parse(JSON.stringify(DATA.fics)),
     matrix: JSON.parse(JSON.stringify(DATA.matrix)),
     matrixCols: DATA.matrixCols.slice(),
-    trees: [],
     stories: JSON.parse(JSON.stringify(STORIES_DEFAULT))
   };
 }
@@ -771,9 +743,6 @@ function saveToLocal(){
 // ============================================
 // FIREBASE REST API
 // ============================================
-// Firebase запрещает . $ # [ ] / в ключах объектов.
-// Кодируем их при отправке, декодируем при получении.
-
 function encodeKeys(obj){
   if(obj === null || obj === undefined) return obj;
   if(Array.isArray(obj)) return obj.map(encodeKeys);
@@ -816,7 +785,6 @@ async function fbFetch(){
   const data = await r.json();
   return decodeKeys(data);
 }
-
 async function fbPut(data){
   const r = await fetch(FIREBASE_URL + "/" + FB_PATH + ".json", {
     method: "PUT",
@@ -827,7 +795,6 @@ async function fbPut(data){
   return await r.json();
 }
 
-// Статус синхронизации
 function setSyncStatus(status){
   _syncStatus = status;
   const dot = document.getElementById("syncDot");
@@ -851,7 +818,6 @@ function setSyncStatus(status){
   }
 }
 
-// Проверка: изменилось ли что-то на сервере
 function remoteChanged(remoteData){
   const remoteJSON = JSON.stringify(remoteData || {});
   if(remoteJSON === _lastRemoteJSON) return false;
@@ -859,13 +825,11 @@ function remoteChanged(remoteData){
   return true;
 }
 
-// Основной цикл синхронизации
 async function syncLoop(){
   try{
     setSyncStatus("syncing");
     const remote = await fbFetch();
 
-    // Первая загрузка: если облако пустое — заливаем локальные данные
     if(!remote){
       const migrated = localStorage.getItem(LS_MIGRATED);
       const local = loadFromLocal();
@@ -880,7 +844,6 @@ async function syncLoop(){
         setSyncStatus("on");
         return;
       } else {
-        // Уже мигрировали, но облако пустое (кто-то стёр?) — заливаем то что есть в DB
         await fbPut(DB);
         _lastRemoteJSON = JSON.stringify(DB);
         setSyncStatus("on");
@@ -888,7 +851,6 @@ async function syncLoop(){
       }
     }
 
-    // Сравниваем с последним известным
     if(remoteChanged(remote)){
       DB = {
         chars: remote.chars || [],
@@ -897,7 +859,6 @@ async function syncLoop(){
         fics: remote.fics || [],
         matrix: remote.matrix || {},
         matrixCols: remote.matrixCols || DATA.matrixCols.slice(),
-        trees: remote.trees || [],
         stories: (remote.stories || []).map(migrateStory)
       };
       saveToLocal();
@@ -910,7 +871,6 @@ async function syncLoop(){
   }
 }
 
-// Сохранение — сначала в локаль, потом в облако
 async function save(){
   saveToLocal();
   setSyncStatus("syncing");
@@ -924,7 +884,6 @@ async function save(){
   }
 }
 
-// Кнопки в настройках
 async function forceSync(){
   _lastRemoteJSON = "";
   await syncLoop();
@@ -955,7 +914,6 @@ async function forceDownload(){
       fics: remote.fics || [],
       matrix: remote.matrix || {},
       matrixCols: remote.matrixCols || DATA.matrixCols.slice(),
-      trees: remote.trees || [],
       stories: (remote.stories || []).map(migrateStory)
     };
     saveToLocal();
@@ -969,10 +927,21 @@ async function forceDownload(){
   }
 }
 
-// Утилиты
+// ============================================
+// УТИЛИТЫ
+// ============================================
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const esc = s => (s||'').toString().replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const closeModal = id => document.getElementById(id).classList.remove('active');
+
+function formatDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return '';
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  return `${day}.${month}.${d.getFullYear()}`;
+}
 
 function calcAge(birthStr){
   if(!birthStr) return null;
@@ -1215,48 +1184,6 @@ function deleteFamily(idx){
   save(); renderFamilies(); updateCounts();
 }
 
-function renderTrees(){
-  const grid = document.getElementById('treesGrid');
-  if(!DB.trees.length){ grid.innerHTML = '<div class="empty">Пока ни одной схемы. Загрузи картинку выше.</div>'; return; }
-  grid.innerHTML = DB.trees.map((t, idx) => `
-    <div class="tree-card" onclick="openLightbox('${t.id}')">
-      <div class="tree-actions">
-        <button onclick="event.stopPropagation();renameTree(${idx})">Переименовать</button>
-        <button onclick="event.stopPropagation();deleteTree(${idx})">Удалить</button>
-      </div>
-      <img src="${t.data}" alt="${esc(t.name)}">
-      <div class="tree-title">${esc(t.name)}</div>
-    </div>`).join('');
-}
-function renameTree(idx){
-  const t = DB.trees[idx];
-  const newName = prompt('Новое название:', t.name);
-  if(newName && newName.trim()){ t.name = newName.trim(); save(); renderTrees(); }
-}
-function deleteTree(idx){
-  if(!confirm('Удалить схему?')) return;
-  DB.trees.splice(idx, 1);
-  save(); renderTrees(); updateCounts();
-}
-function handleTreeFiles(files){
-  Array.from(files).forEach(file => {
-    if(!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      DB.trees.push({ id: uid(), name: file.name.replace(/\.[^.]+$/, ''), data: e.target.result });
-      save(); renderTrees(); updateCounts();
-    };
-    reader.readAsDataURL(file);
-  });
-}
-function openLightbox(id){
-  const t = DB.trees.find(x => x.id === id);
-  if(!t) return;
-  document.getElementById('lightboxImg').src = t.data;
-  document.getElementById('lightbox').classList.add('active');
-}
-function closeLightbox(){ document.getElementById('lightbox').classList.remove('active'); }
-
 let selectedColor = "love";
 let selectedLetter = "";
 let matrixSize = localStorage.getItem('matrix-size') || 'normal';
@@ -1403,6 +1330,76 @@ function filterMatrix(query){
       if(val.letter === q) cell.classList.add('search-hit');
     });
   }
+}
+
+// ============================================
+// РЕДАКТОР СПИСКА МАТРИЦЫ
+// ============================================
+let _matrixEditorTemp = [];
+
+function openMatrixEditor(){
+  _matrixEditorTemp = DB.matrixCols.slice();
+  renderMatrixEditorList();
+  document.getElementById('matrixEditModal').classList.add('active');
+}
+
+function renderMatrixEditorList(){
+  const wrap = document.getElementById('matrixEditorList');
+  wrap.innerHTML = _matrixEditorTemp.map((name, i) => `
+    <div class="matrix-editor-row" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+      <span style="color:var(--muted);font-size:12px;min-width:24px;text-align:right">${i+1}</span>
+      <input value="${esc(name)}" oninput="_matrixEditorTemp[${i}] = this.value"
+             style="flex:1;padding:8px 10px;font-size:13px;margin:0">
+      <button class="btn btn-ghost btn-sm" onclick="matrixMove(${i},-1)" title="Вверх" ${i===0?'disabled':''}>↑</button>
+      <button class="btn btn-ghost btn-sm" onclick="matrixMove(${i},1)" title="Вниз" ${i===_matrixEditorTemp.length-1?'disabled':''}>↓</button>
+      <button class="btn btn-ghost btn-sm btn-danger" onclick="matrixRemove(${i})" title="Удалить">✕</button>
+    </div>
+  `).join('') || '<div class="empty">Список пуст</div>';
+}
+
+function matrixAddRow(){
+  _matrixEditorTemp.push('');
+  renderMatrixEditorList();
+  setTimeout(() => {
+    const wrap = document.getElementById('matrixEditorList');
+    if(wrap) wrap.scrollTop = wrap.scrollHeight;
+  }, 50);
+}
+
+function matrixMove(i, dir){
+  const j = i + dir;
+  if(j < 0 || j >= _matrixEditorTemp.length) return;
+  const tmp = _matrixEditorTemp[i];
+  _matrixEditorTemp[i] = _matrixEditorTemp[j];
+  _matrixEditorTemp[j] = tmp;
+  renderMatrixEditorList();
+}
+
+function matrixRemove(i){
+  if(!confirm(`Удалить «${_matrixEditorTemp[i] || 'без имени'}» из списка матрицы?`)) return;
+  _matrixEditorTemp.splice(i, 1);
+  renderMatrixEditorList();
+}
+
+function matrixSaveCols(){
+  const cleaned = _matrixEditorTemp.map(s => s.trim()).filter(Boolean);
+  const seen = new Set();
+  const dup = [];
+  cleaned.forEach(n => { if(seen.has(n)) dup.push(n); seen.add(n); });
+  if(dup.length){
+    if(!confirm(`Есть дубликаты: ${[...new Set(dup)].join(', ')}. Всё равно сохранить?`)) return;
+  }
+  DB.matrixCols = cleaned;
+  save();
+  renderMatrix();
+  updateCounts();
+  closeModal('matrixEditModal');
+}
+
+function matrixResetCols(){
+  if(!confirm('Сбросить список к исходному? Кастомный порядок пропадёт.')) return;
+  _matrixEditorTemp = DATA.matrixCols.slice();
+  renderMatrixEditorList();
 }
 
 function renderFics(){
@@ -1608,12 +1605,18 @@ function renderWatch(){
       <div class="check ${w.done?'on':''}" onclick="toggleWatch('${w.id}')">✓</div>
       <div class="watch-info">
         <div class="watch-title">${esc(w.title)}</div>
-        <div class="watch-meta">${t[w.type]||'Другое'}</div>
+        <div class="watch-meta">${t[w.type]||'Другое'}${w.done && w.watchedDate ? ' · просмотрено ' + formatDate(w.watchedDate) : ''}</div>
       </div>
       <button class="btn-del" style="position:static;opacity:1" onclick="delWatch('${w.id}')">✕</button>
     </div>`).join('');
 }
-function toggleWatch(id){ const w = DB.watch.find(x=>x.id===id); w.done=!w.done; save(); renderWatch(); updateCounts(); }
+function toggleWatch(id){
+  const w = DB.watch.find(x=>x.id===id);
+  w.done = !w.done;
+  if(w.done) w.watchedDate = new Date().toISOString();
+  else delete w.watchedDate;
+  save(); renderWatch(); updateCounts();
+}
 function openWatchModal(){ document.getElementById('watchTitle').value=''; document.getElementById('watchType').value='film'; document.getElementById('watchModal').classList.add('active'); }
 function saveWatch(){
   const title = document.getElementById('watchTitle').value.trim();
@@ -1626,7 +1629,6 @@ function delWatch(id){ if(!confirm('Удалить?'))return; DB.watch = DB.watc
 function updateCounts(){
   document.getElementById('navChars').textContent = DB.chars.length;
   document.getElementById('navFam').textContent = DB.families.length;
-  document.getElementById('navTrees').textContent = DB.trees.length;
   document.getElementById('navMatrix').textContent = Object.keys(DB.matrix).length;
   document.getElementById('navFics').textContent = DB.fics.length;
   document.getElementById('navStories').textContent = DB.stories.length;
@@ -1652,7 +1654,6 @@ function importData(e){
       if(d.fics) DB.fics = d.fics;
       if(d.matrix) DB.matrix = d.matrix;
       if(d.matrixCols) DB.matrixCols = d.matrixCols;
-      if(d.trees) DB.trees = d.trees;
       if(d.stories) DB.stories = d.stories.map(migrateStory);
       save(); renderAll(); alert('Импортировано');
     }catch{ alert('Ошибка файла'); }
@@ -1664,19 +1665,8 @@ document.querySelectorAll('.modal').forEach(m=>{
   m.onclick = e => { if(e.target === m) m.classList.remove('active'); };
 });
 
-const dropZone = document.getElementById('dropZone');
-const treeInput = document.getElementById('treeInput');
-dropZone.onclick = () => treeInput.click();
-treeInput.onchange = e => handleTreeFiles(e.target.files);
-dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
-dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-dropZone.ondrop = e => {
-  e.preventDefault(); dropZone.classList.remove('dragover');
-  handleTreeFiles(e.dataTransfer.files);
-};
-
 function renderAll(){
-  renderChars(); renderFamilies(); renderTrees(); renderPickers(); renderMatrix();
+  renderChars(); renderFamilies(); renderPickers(); renderMatrix();
   renderFics(); renderStories(); renderWatch(); updateCounts(); updateHint();
   document.querySelectorAll('.zoom-btn').forEach(b => {
     b.onclick = () => setMatrixSize(b.dataset.size);
@@ -1684,21 +1674,12 @@ function renderAll(){
   setMatrixSize(matrixSize);
 }
 
-// ============================================
-// СТАРТ
-// ============================================
 async function init(){
   initTheme();
-
-  // Сначала загружаем локальные — чтобы сайт сразу показал что-то
   DB = loadFromLocal();
   renderAll();
   setSyncStatus("loading");
-
-  // Потом синхронизируемся с облаком
   await syncLoop();
-
-  // Дальше — цикл обновлений каждые N секунд
   setInterval(syncLoop, SYNC_INTERVAL);
 }
 
