@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>тест</title>
+<style>
+  :root{
+    --bg:#f4f7fb; --bg-alt:#e8f0f8; --surface:#ffffff; --surface-soft:#eaf3fb;
+    --border:#d8e5f0; --text:#1e2a38; --text-soft:#4a5b6d; --muted:#7a8a9b;
+    --accent:#4a90c2; --accent-hover:#3d7aab; --accent-soft:#e0eef8;
+    --orange:#e8915a; --orange-hover:#d17b45; --done:#6dbf7e;
+    --radius-lg:32px; --radius-md:20px; --radius-sm:12px;
+    --shadow-sm:0 2px 12px rgba(74,144,194,.06);
+    --shadow-md:0 6px 24px rgba(74,144,194,.10);
+    --shadow-lg:0 12px 40px rgba(74,144,194,.14);
+  }
+  body.theme-dark{
+    --bg:#0f1720; --bg-alt:#141e2a; --surface:#1a2431; --surface-soft:#1e2c3b;
+    --border:#2a3949; --text:#e6eef7; --text-soft:#b0c0d0; --muted:#7a8fa3;
+    --accent:#5fa8d9; --accent-hover:#7bb8e0; --accent-soft:#1e3044;
+    --orange:#e8915a; --orange-hover:#f0a373; --done:#6dbf7e;
+    --shadow-sm:0 2px 12px rgba(0,0,0,.2);
+    --shadow-md:0 6px 24px rgba(0,0,0,.25);
+    --shadow-lg:0 12px 40px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',-apple-system,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14.5px;line-height:1.6;letter-spacing:-.005em}
+
+  .sidebar{
+    width:240px;background:var(--bg-alt);padding:28px 14px 20px;
+    display:flex;flex-direction:column;gap:4px;
+    position:sticky;top:0;height:100vh;flex-shrink:0;overflow-y:auto;
+    border-right:1px solid var(--border);
+  }
+  .logo{font-size:18px;font-weight:700;padding:0 14px 24px;letter-spacing:-.02em;color:var(--accent)}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-soft);transition:all .2s cubic-bezier(.4,0,.2,1);font-size:14px;font-weight:500}
+  .nav-item:hover{background:var(--surface);color:var(--text);transform:translateX(2px)}
+  .nav-item.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:var(--shadow-sm)}
+  .nav-count{margin-left:auto;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--bg);padding:2px 8px;border-radius:8px;font-weight:600}
+  .nav-item.active .nav-count{background:var(--accent-soft);color:var(--accent)}
+
+  /* Sync-индикатор */
+  .sync-badge{
+    display:flex;align-items:center;gap:8px;padding:8px 12px;margin:0 4px 12px;
+    border-radius:var(--radius-sm);background:var(--surface);font-size:12px;
+    color:var(--text-soft);font-weight:500;box-shadow:var(--shadow-sm);
+    transition:all .3s;
+  }
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;transition:all .3s}
+  .sync-dot.on{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.6)}
+  .sync-dot.syncing{background:#eab308;animation:pulse 1s infinite}
+  .sync-dot.off{background:#dc2626}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .sync-text{flex:1;font-size:11.5px}
+
+  .main{flex:1;padding:44px 56px;max-width:1400px;min-width:0}
+  .panel{display:none;animation:fadeIn .25s ease-out}
+  .panel.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;gap:24px;flex-wrap:wrap}
+  .page-head h1{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:6px}
+  .page-head .sub{color:var(--muted);font-size:14.5px;font-weight:400}
+
+  .btn{background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:600;letter-spacing:-.005em;transition:all .2s cubic-bezier(.4,0,.2,1);white-space:nowrap;box-shadow:0 2px 8px rgba(74,144,194,.2)}
+  .btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(74,144,194,.3)}
+  .btn:active{transform:translateY(0)}
+  .btn-orange{background:var(--orange);box-shadow:0 2px 8px rgba(232,145,90,.25)}
+  .btn-orange:hover{background:var(--orange-hover);box-shadow:0 4px 14px rgba(232,145,90,.35)}
+  .btn-ghost{background:var(--surface);border:1.5px solid var(--border);color:var(--text);box-shadow:none}
+  .btn-ghost:hover{background:var(--surface-soft);border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .btn-sm{padding:7px 14px;font-size:12.5px}
+  .btn-danger{background:transparent;border:1.5px solid #dc2626;color:#dc2626;box-shadow:none}
+  .btn-danger:hover{background:rgba(220,38,38,.08);border-color:#dc2626;color:#dc2626}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+  .card{background:var(--surface);border-radius:var(--radius-md);padding:22px;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;cursor:pointer;border:1.5px solid transparent;box-shadow:var(--shadow-sm)}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--accent-soft)}
+  .card h3{font-size:15.5px;font-weight:650;margin-bottom:6px;letter-spacing:-.01em;line-height:1.35}
+  .card p{color:var(--text-soft);font-size:13.5px;margin-bottom:10px;line-height:1.55}
+  .card .nick{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+  .card .author{color:var(--muted);font-size:12.5px;margin-bottom:8px;font-style:italic}
+
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .tag{background:var(--accent-soft);color:var(--accent);padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600;letter-spacing:-.005em}
+  .tag.plus{background:#fde8e8;color:#c53030}
+  body.theme-dark .tag.plus{background:#3d1a1a;color:#fca5a5}
+
+  .btn-del{position:absolute;top:14px;right:14px;background:var(--surface-soft);border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:5px 9px;border-radius:10px;opacity:0;transition:all .2s}
+  .card:hover .btn-del{opacity:1}
+  .btn-del:hover{background:#fde8e8;color:#c53030}
+  .card-actions{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .filter-btn{padding:7px 15px;border-radius:20px;background:var(--surface);border:1.5px solid var(--border);color:var(--text-soft);cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;white-space:nowrap}
+  .filter-btn:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-1px)}
+  .filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(74,144,194,.2);font-weight:600}
+
+  .watch-item{display:flex;align-items:center;gap:14px;background:var(--surface);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:10px;transition:all .2s;box-shadow:var(--shadow-sm)}
+  .watch-item:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  .watch-item.done{opacity:.55}
+  .watch-item.done .watch-title{text-decoration:line-through;color:var(--muted)}
+  .check{width:22px;height:22px;border-radius:8px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:12px;color:transparent}
+  .check:hover{border-color:var(--accent);transform:scale(1.1)}
+  .check.on{background:var(--done);border-color:var(--done);color:#fff}
+  .watch-info{flex:1;min-width:0}
+  .watch-title{font-weight:550;font-size:14.5px;letter-spacing:-.005em}
+  .watch-meta{font-size:12.5px;color:var(--muted);margin-top:3px}
+
+  .modal{display:none;position:fixed;inset:0;background:rgba(30,42,56,.55);z-index:100;justify-content:center;align-items:center;padding:24px;backdrop-filter:blur(6px);animation:fadeIn .2s}
+  .modal.active{display:flex}
+  .modal-content{background:var(--surface);border-radius:var(--radius-lg);padding:32px;max-width:740px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .25s cubic-bezier(.4,0,.2,1)}
+  @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .modal-content h2{font-size:22px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em;line-height:1.3}
+  .modal-content .meta{color:var(--muted);font-size:13px;margin-bottom:22px}
+  .modal-content label{display:block;margin-bottom:6px;font-size:12.5px;color:var(--text-soft);font-weight:600;letter-spacing:.01em}
+  .modal-content input,.modal-content textarea,.modal-content select{width:100%;padding:11px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--text);margin-bottom:16px;font-size:14px;font-family:inherit;transition:all .2s}
+  .modal-content input:focus,.modal-content textarea:focus,.modal-content select:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-soft)}
+  .modal-content textarea{min-height:80px;resize:vertical}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+
+  .story-text{white-space:pre-wrap;font-size:14.5px;line-height:1.75;color:var(--text);margin-top:18px}
+
+  .family-card{background:var(--surface);border-radius:var(--radius-md);padding:24px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:all .25s;border:1.5px solid transparent}
+  .family-card:hover{box-shadow:var(--shadow-md);border-color:var(--accent-soft)}
+  .family-card h3{font-size:16px;font-weight:650;letter-spacing:-.01em}
+  .family-list{display:flex;flex-direction:column;gap:2px;margin-top:14px}
+  .family-row{display:flex;gap:14px;font-size:13.5px;padding:9px 0;border-bottom:1px solid var(--border);align-items:baseline}
+  .family-row:last-child{border-bottom:none}
+  .family-row .nm{color:var(--accent);font-weight:650;min-width:90px;font-size:13.5px}
+  .family-row .full{color:var(--text-soft);flex:1;line-height:1.5}
+
+  .tree-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+  .tree-card{background:var(--surface);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow-sm);transition:all .25s;position:relative;cursor:zoom-in}
+  .tree-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .tree-card img{width:100%;height:auto;border-radius:var(--radius-sm);display:block;background:var(--bg-alt)}
+  .tree-card .tree-title{font-size:14px;font-weight:600;margin-top:12px;text-align:center;color:var(--text)}
+  .tree-card .tree-actions{position:absolute;top:24px;right:24px;display:flex;gap:6px;opacity:0;transition:opacity .2s}
+  .tree-card:hover .tree-actions{opacity:1}
+  .tree-card .tree-actions button{background:rgba(255,255,255,.95);border:none;color:var(--text);padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;box-shadow:var(--shadow-sm)}
+  .tree-card .tree-actions button:hover{background:#fff;transform:scale(1.05)}
+
+  .drop-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:48px 24px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface);margin-bottom:24px}
+  .drop-zone:hover, .drop-zone.dragover{border-color:var(--accent);background:var(--accent-soft)}
+  .drop-zone .dz-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
+  .drop-zone .dz-sub{font-size:13.5px;color:var(--muted)}
+
+  .matrix-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:12px 16px;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm)}
+  .matrix-toolbar .label{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:4px}
+  .matrix-toolbar .btn-sm{padding:6px 12px;font-size:12.5px}
+  .matrix-toolbar .zoom-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .matrix-toolbar input{padding:7px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;min-width:150px;margin:0}
+  .matrix-toolbar input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+  .picker-block{background:var(--surface);border-radius:var(--radius-md);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+  .picker-block h3{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+  .picker-row{display:flex;flex-wrap:wrap;gap:8px}
+  .pick-swatch{width:38px;height:38px;border-radius:12px;cursor:pointer;border:3px solid transparent;transition:all .15s;position:relative;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .pick-swatch:hover{transform:scale(1.12);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+  .pick-swatch.active{border-color:var(--text);box-shadow:0 0 0 2px var(--surface) inset, 0 0 0 4px var(--accent);transform:scale(1.05)}
+  .pick-swatch.none{background:repeating-linear-gradient(45deg,#f4f7fb,#f4f7fb 5px,#e8f0f8 5px,#e8f0f8 10px)}
+  body.theme-dark .pick-swatch.none{background:repeating-linear-gradient(45deg,#1a2431,#1a2431 5px,#243342 5px,#243342 10px)}
+  .pick-letter{width:44px;height:44px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:17px;font-weight:700;color:var(--text-soft);transition:all .15s;display:flex;align-items:center;justify-content:center}
+  .pick-letter:hover{background:var(--surface-soft);color:var(--accent);border-color:var(--accent);transform:translateY(-2px)}
+  .pick-letter.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(74,144,194,.3)}
+  .picker-hint{font-size:13px;color:var(--text-soft);padding:14px 18px;background:var(--accent-soft);border-radius:var(--radius-sm);margin-bottom:18px;line-height:1.6}
+
+  .matrix-wrap{overflow:auto;border-radius:var(--radius-md);background:var(--surface);max-height:76vh;box-shadow:var(--shadow-sm)}
+  .matrix{border-collapse:separate;border-spacing:0;font-size:12.5px}
+  .matrix th,.matrix td{padding:0;text-align:center;white-space:nowrap}
+  .matrix thead th{background:var(--bg-alt);position:sticky;top:0;z-index:2;font-weight:600;padding:10px 8px;color:var(--text-soft);font-size:11px;max-width:70px;overflow:hidden;text-overflow:ellipsis;border-bottom:2px solid var(--border)}
+  .matrix thead th.corner{left:0;z-index:3;background:var(--bg-alt)}
+  .matrix tbody th{background:var(--bg-alt);position:sticky;left:0;z-index:1;font-weight:600;padding:10px 12px;text-align:left;color:var(--text);font-size:12.5px;max-width:130px;overflow:hidden;text-overflow:ellipsis;border-right:2px solid var(--border)}
+  .matrix .cell{width:32px;height:32px;cursor:pointer;position:relative;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transition:outline .1s}
+  .matrix .cell:hover{outline:2.5px solid var(--accent);outline-offset:-2.5px;z-index:5;border-radius:6px}
+  .matrix .cell.diag{background:repeating-linear-gradient(45deg,#f4f7fb,#f4f7fb 4px,#e8f0f8 4px,#e8f0f8 8px);cursor:default}
+  body.theme-dark .matrix .cell.diag{background:repeating-linear-gradient(45deg,#1a2431,#1a2431 4px,#243342 4px,#243342 8px)}
+  .matrix .cell .letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#1e2a38;text-shadow:0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff}
+  .matrix .cell .letter.on-color{color:#fff;text-shadow:0 0 2px rgba(0,0,0,.6), 0 0 4px rgba(0,0,0,.4)}
+  .matrix tr.hl th, .matrix tr.hl td{background-color:rgba(74,144,194,.08)}
+  .matrix td.hl{background-color:rgba(74,144,194,.12) !important}
+  .matrix thead th.hl{background-color:rgba(74,144,194,.16)}
+
+  .matrix.size-compact .cell{width:18px;height:18px}
+  .matrix.size-compact thead th{padding:5px 4px;font-size:9.5px;max-width:40px}
+  .matrix.size-compact tbody th{padding:5px 8px;font-size:11px;max-width:90px}
+  .matrix.size-compact .cell .letter{font-size:11px}
+
+  .matrix.size-normal .cell{width:24px;height:24px}
+  .matrix.size-normal thead th{padding:7px 6px;font-size:10.5px;max-width:55px}
+  .matrix.size-normal tbody th{padding:7px 10px;font-size:11.5px;max-width:110px}
+  .matrix.size-normal .cell .letter{font-size:12px}
+
+  .matrix.size-large .cell{width:32px;height:32px}
+  .matrix.size-large thead th{padding:10px 8px;font-size:11px;max-width:70px}
+  .matrix.size-large tbody th{padding:10px 12px;font-size:12.5px;max-width:130px}
+  .matrix.size-large .cell .letter{font-size:14px}
+
+  .matrix .cell.search-hit{background-color:#fde68a !important;box-shadow:inset 0 0 0 2px #f59e0b}
+  .matrix tbody th.search-hit, .matrix thead th.search-hit{background-color:#fde68a !important;color:#1c1917}
+
+  .story-group{margin-bottom:36px}
+  .story-group-title{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:16px;color:var(--text);display:flex;align-items:center;gap:10px}
+  .story-group-title::after{content:'';flex:1;height:1px;background:var(--border);margin-left:12px}
+  .story-group-count{font-size:12px;color:var(--muted);font-weight:500;background:var(--surface);padding:2px 10px;border-radius:12px}
+
+  .story-groups-picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .group-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text-soft);transition:all .2s;user-select:none;margin:0}
+  .group-chip:hover{border-color:var(--accent);color:var(--accent)}
+  .group-chip input{display:none}
+  .group-chip:has(input:checked){background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(74,144,194,.2)}
+
+  .empty{text-align:center;color:var(--muted);padding:64px 24px;font-size:14.5px;background:var(--surface);border-radius:var(--radius-md);border:1.5px dashed var(--border)}
+  .divider{height:1px;background:var(--border);margin:24px 0}
+
+  .lightbox{position:fixed;inset:0;background:rgba(15,23,32,.92);z-index:200;display:none;justify-content:center;align-items:center;padding:24px;cursor:zoom-out}
+  .lightbox.active{display:flex;animation:fadeIn .2s}
+  .lightbox img{max-width:95vw;max-height:90vh;border-radius:var(--radius-md);box-shadow:var(--shadow-lg)}
+  .lightbox-close{position:absolute;top:20px;right:24px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:12px;cursor:pointer;transition:background .2s}
+  .lightbox-close:hover{background:rgba(255,255,255,.3)}
+
+  @media (max-width: 700px){
+    .sidebar{width:72px;padding:20px 8px}
+    .logo{padding:0 0 16px;text-align:center;font-size:0}
+    .logo::before{content:'т';font-size:20px;color:var(--accent);font-weight:700}
+    .nav-item{justify-content:center;padding:12px 0;gap:0;font-size:0}
+    .nav-item .label,.nav-count{display:none}
+    .sync-badge{padding:8px;justify-content:center}
+    .sync-text{display:none}
+    .main{padding:28px 20px}
+    .page-head h1{font-size:24px}
+    .modal-content{padding:22px;border-radius:24px}
+    .matrix .cell{width:26px;height:26px}
+    .card{padding:18px}
+    .tree-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">тест</div>
+  <div class="sync-badge" title="Статус синхронизации с облаком">
+    <span class="sync-dot" id="syncDot"></span>
+    <span class="sync-text" id="syncText">Загрузка...</span>
+  </div>
+  <div class="nav-item active" data-tab="chars"><span class="label">Персонажи</span><span class="nav-count" id="navChars">0</span></div>
+  <div class="nav-item" data-tab="families"><span class="label">Семьи</span><span class="nav-count" id="navFam">0</span></div>
+  <div class="nav-item" data-tab="trees"><span class="label">Древо</span><span class="nav-count" id="navTrees">0</span></div>
+  <div class="nav-item" data-tab="matrix"><span class="label">Матрица</span><span class="nav-count" id="navMatrix">0</span></div>
+  <div class="nav-item" data-tab="fics"><span class="label">Зарисовки</span><span class="nav-count" id="navFics">0</span></div>
+  <div class="nav-item" data-tab="stories"><span class="label">Аушки</span><span class="nav-count" id="navStories">0</span></div>
+  <div class="nav-item" data-tab="watch"><span class="label">Посмотреть</span><span class="nav-count" id="navWatch">0</span></div>
+  <div class="nav-item" id="themeToggle" style="margin-top:auto"><span class="label" id="themeLabel">Тёмная</span></div>
+  <div class="nav-item" data-tab="settings"><span class="label">Настройки</span></div>
+</aside>
+
+<main class="main">
+  <section class="panel active" id="chars">
+    <div class="page-head">
+      <div><h1>Персонажи</h1><div class="sub">Все герои по категориям</div></div>
+      <button class="btn btn-orange" onclick="openCharEdit()">+ Персонаж</button>
+    </div>
+    <div class="filters" id="charFilters"></div>
+    <div class="grid" id="charsGrid"></div>
+  </section>
+
+  <section class="panel" id="families">
+    <div class="page-head">
+      <div><h1>Семьи</h1><div class="sub">Родственные связи</div></div>
+      <button class="btn btn-orange" onclick="openFamilyEdit()">+ Семья</button>
+    </div>
+    <div id="familiesList"></div>
+  </section>
+
+  <section class="panel" id="trees">
+    <div class="page-head">
+      <div><h1>Семейные древа</h1><div class="sub">Схемы родословных</div></div>
+    </div>
+    <div class="drop-zone" id="dropZone">
+      <div class="dz-title">Перетащи картинки сюда или нажми</div>
+      <div class="dz-sub">PNG, JPG — сохранятся в облаке</div>
+      <input type="file" id="treeInput" accept="image/*" multiple style="display:none">
+    </div>
+    <div class="tree-grid" id="treesGrid"></div>
+  </section>
+
+  <section class="panel" id="matrix">
+    <div class="page-head">
+      <div><h1>Матрица отношений</h1><div class="sub">Смотреть сверху вниз: строка = чьё отношение, столбец = к кому</div></div>
+      <button class="btn btn-ghost" onclick="if(confirm('Очистить все ячейки?')){DB.matrix={};save();renderMatrix();updateCounts();}">Очистить всё</button>
+    </div>
+
+    <div class="matrix-toolbar">
+      <span class="label">Масштаб:</span>
+      <button class="btn btn-ghost btn-sm zoom-btn" data-size="compact">Компактный</button>
+      <button class="btn btn-ghost btn-sm zoom-btn" data-size="normal">Обычный</button>
+      <button class="btn btn-ghost btn-sm zoom-btn" data-size="large">Крупный</button>
+      <button class="btn btn-ghost btn-sm" onclick="fitMatrix()">Уместить на экране</button>
+      <input id="matrixSearch" placeholder="Найти имя..." oninput="filterMatrix(this.value)">
+    </div>
+
+    <div class="picker-block">
+      <h3>Цвет</h3>
+      <div class="picker-row" id="colorPicker"></div>
+    </div>
+    <div class="picker-block">
+      <h3>Буква</h3>
+      <div class="picker-row" id="letterPicker"></div>
+    </div>
+    <div class="picker-hint" id="pickerHint"></div>
+    <div class="matrix-wrap" id="matrixWrap"></div>
+  </section>
+
+  <section class="panel" id="fics">
+    <div class="page-head">
+      <div><h1>Зарисовки</h1><div class="sub">Тут пишем всякое</div></div>
+      <button class="btn btn-orange" onclick="openFicModal()">+ Зарисовка</button>
+    </div>
+    <div class="grid" id="ficsGrid"></div>
+  </section>
+
+  <section class="panel" id="stories">
+    <div class="page-head">
+      <div><h1>Аушки</h1><div class="sub">AU-истории по персонажам</div></div>
+      <button class="btn btn-orange" onclick="openStoryEdit()">+ Аушка</button>
+    </div>
+    <div id="storiesContainer"></div>
+  </section>
+
+  <section class="panel" id="watch">
+    <div class="page-head">
+      <div><h1>Что посмотреть</h1><div class="sub">Общий список</div></div>
+      <button class="btn btn-orange" onclick="openWatchModal()">+ Добавить</button>
+    </div>
+    <div class="filters" id="watchTypeFilters">
+      <button class="filter-btn active" data-wtype="all">Все типы</button>
+      <button class="filter-btn" data-wtype="film">Фильмы</button>
+      <button class="filter-btn" data-wtype="series">Сериалы</button>
+      <button class="filter-btn" data-wtype="cartoon">Мультфильмы</button>
+      <button class="filter-btn" data-wtype="other">Другое</button>
+    </div>
+    <div class="filters" id="watchFilters">
+      <button class="filter-btn active" data-wfilter="all">Все по статусу</button>
+      <button class="filter-btn" data-wfilter="todo">Не посмотрено</button>
+      <button class="filter-btn" data-wfilter="done">Посмотрено</button>
+    </div>
+    <div id="watchList"></div>
+  </section>
+
+  <section class="panel" id="settings">
+    <div class="page-head"><div><h1>Настройки</h1><div class="sub">Синхронизация и экспорт</div></div></div>
+    <div class="card" style="max-width:600px;cursor:default">
+      <h3 style="margin-bottom:12px">☁️ Облачная синхронизация</h3>
+      <p style="margin-bottom:16px;color:var(--text-soft);font-size:13.5px;line-height:1.6">
+        Все данные хранятся в Firebase и синхронизируются между устройствами автоматически каждые 3 секунды.
+      </p>
+      <div id="settingsSyncInfo" style="margin-bottom:16px;padding:12px 16px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;color:var(--text-soft)"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="forceSync()">Синхронизировать сейчас</button>
+        <button class="btn btn-ghost" onclick="forceUpload()">Залить локальные в облако</button>
+        <button class="btn btn-ghost" onclick="forceDownload()">Скачать из облака</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3 style="margin-bottom:12px">💾 Резервные копии</h3>
+      <p style="margin-bottom:16px;color:var(--text-soft);font-size:13.5px;line-height:1.6">
+        Экспортируй JSON — на случай, если что-то пойдёт не так.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="exportData()">Экспорт JSON</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">Импорт JSON</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-ghost" onclick="if(confirm('Сбросить локальные данные к исходным? (в облаке останется как есть)')){localStorage.clear();location.reload()}">Сбросить локальные к исходнику</button>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="charModal"><div class="modal-content">
+  <h2 id="charModalTitle">Персонаж</h2>
+  <div id="charModalBody"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost btn-danger" onclick="deleteCharFromModal()">Удалить</button>
+    <button class="btn btn-ghost" onclick="closeModal('charModal')">Закрыть</button>
+    <button class="btn" id="charModalEditBtn">Изменить</button>
+  </div>
+</div></div>
+
+<div class="modal" id="charEditModal"><div class="modal-content">
+  <h2 id="charEditTitle">Персонаж</h2>
+  <input type="hidden" id="charEditId">
+  <label>Кличка *</label><input id="charEditNick">
+  <label>ФИО</label><input id="charEditName">
+  <label>Группа</label>
+  <select id="charEditGroup">
+    <option value="main">Основные</option>
+    <option value="second">Вторые основные</option>
+    <option value="minor">Второстепенные</option>
+    <option value="school">Школьники</option>
+    <option value="fantasy">Фэнтези</option>
+  </select>
+  <label>Дата рождения</label><input id="charEditBirth" placeholder="26.04.1986, 1:26">
+  <label>Возраст (если нет даты)</label><input id="charEditAge" type="number">
+  <label>Место рождения</label><input id="charEditBirthPlace">
+  <label>Место жительства</label><input id="charEditLive">
+  <label>Рост \ вес</label><input id="charEditHeight">
+  <label>Здоровье</label><input id="charEditHealth">
+  <label>Внешность</label><input id="charEditAppearance">
+  <label>Темперамент</label><input id="charEditTemperament">
+  <label>Привычки</label><input id="charEditHabits">
+  <label>Тип привязанности</label><input id="charEditAttachment">
+  <label>Проявления любви</label><input id="charEditLoveType">
+  <label>Любовный интерес</label><input id="charEditLove">
+  <label>Семья</label><input id="charEditFamily">
+  <label>Друзья</label><input id="charEditFriends">
+  <label>Враги</label><input id="charEditEnemies">
+  <label>Профессия</label><input id="charEditProfession">
+  <label>Питомец</label><input id="charEditPet">
+  <label>Хобби</label><input id="charEditHobby">
+  <label>Транспорт</label><input id="charEditTransport">
+  <label>Номер</label><input id="charEditPlate">
+  <label>Любимые места</label><input id="charEditPlaces">
+  <label>Стиль</label><input id="charEditStyle">
+  <label>Тип личности</label><input id="charEditMbti">
+  <label>Банк</label><input id="charEditBank">
+  <label>Телефон</label><input id="charEditPhone">
+  <label>Заметки</label><textarea id="charEditNote"></textarea>
+  <label>Доп.</label><input id="charEditExtra">
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('charEditModal')">Отмена</button>
+    <button class="btn" onclick="saveCharEdit()">Сохранить</button>
+  </div>
+</div></div>
+
+<div class="modal" id="familyEditModal"><div class="modal-content">
+  <h2 id="familyEditTitle">Семья</h2>
+  <input type="hidden" id="familyEditId">
+  <label>Название семьи *</label>
+  <input id="familyEditName">
+  <div class="divider"></div>
+  <label style="font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:10px">Участники</label>
+  <div id="familyMembersList" style="margin-bottom:16px"></div>
+  <button class="btn btn-ghost btn-sm" onclick="addFamilyMemberRow()">+ Добавить участника</button>
+  <div class="modal-actions" style="margin-top:20px">
+    <button class="btn btn-ghost" onclick="closeModal('familyEditModal')">Отмена</button>
+    <button class="btn" onclick="saveFamilyEdit()">Сохранить</button>
+  </div>
+</div></div>
+
+<div class="modal" id="storyModal"><div class="modal-content">
+  <h2 id="storyTitle"></h2>
+  <div class="meta" id="storyMeta"></div>
+  <div id="storyText" class="story-text"></div>
+  <div class="modal-actions" style="margin-top:22px">
+    <button class="btn btn-ghost" onclick="closeModal('storyModal')">Закрыть</button>
+    <button class="btn" id="storyModalEditBtn">Изменить</button>
+  </div>
+</div></div>
+
+<div class="modal" id="storyEditModal"><div class="modal-content">
+  <h2 id="storyEditTitle">Новая аушка</h2>
+  <input type="hidden" id="storyEditId">
+  <label>Название *</label><input id="storyEditName">
+  <label>Группы (можно несколько)</label>
+  <div class="story-groups-picker" id="storyEditGroups">
+    <label class="group-chip"><input type="checkbox" value="bestimovy"> Бестимовы</label>
+    <label class="group-chip"><input type="checkbox" value="artons"> Артоны</label>
+    <label class="group-chip"><input type="checkbox" value="other"> Другое</label>
+  </div>
+  <label>Теги (через запятую)</label>
+  <input id="storyEditTags" placeholder="AU, флафф, 18+">
+  <label>Полный текст</label>
+  <textarea id="storyEditText" style="min-height:300px;font-family:inherit;line-height:1.7"></textarea>
+  <div class="modal-actions" style="margin-top:20px">
+    <button class="btn btn-ghost btn-danger" id="storyEditDeleteBtn" style="display:none">Удалить</button>
+    <button class="btn btn-ghost" onclick="closeModal('storyEditModal')">Отмена</button>
+    <button class="btn" onclick="saveStoryEdit()">Сохранить</button>
+  </div>
+</div></div>
+
+<div class="modal" id="ficViewModal"><div class="modal-content">
+  <h2 id="ficViewTitle"></h2>
+  <div class="meta" id="ficViewMeta"></div>
+  <div id="ficViewBody"></div>
+  <div class="modal-actions" style="margin-top:22px">
+    <button class="btn btn-ghost" onclick="closeModal('ficViewModal')">Закрыть</button>
+    <button class="btn" id="ficOpenLink">Открыть ссылку →</button>
+  </div>
+</div></div>
+
+<div class="modal" id="ficModal"><div class="modal-content">
+  <h2 id="ficModalTitle">Новая зарисовка</h2>
+  <input type="hidden" id="ficId">
+  <label>Название *</label><input id="ficTitle">
+  <label>Ссылка</label><input id="ficLink">
+  <label>Автор</label><input id="ficAuthor">
+  <label>Статус</label>
+  <select id="ficStatus">
+    <option value="idea">Идея</option>
+    <option value="draft">Черновик</option>
+    <option value="done">Готово</option>
+  </select>
+  <label>Теги</label><input id="ficTags" placeholder="через запятую">
+  <label>Заметка</label><textarea id="ficNote"></textarea>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('ficModal')">Отмена</button>
+    <button class="btn" onclick="saveFic()">Сохранить</button>
+  </div>
+</div></div>
+
+<div class="modal" id="watchModal"><div class="modal-content">
+  <h2>Что посмотреть</h2>
+  <label>Название</label><input id="watchTitle">
+  <label>Тип</label>
+  <select id="watchType">
+    <option value="film">Фильм</option>
+    <option value="series">Сериал</option>
+    <option value="cartoon">Мультфильм</option>
+    <option value="other">Другое</option>
+  </select>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('watchModal')">Отмена</button>
+    <button class="btn" onclick="saveWatch()">Сохранить</button>
+  </div>
+</div></div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+// ============================================
+// КОНФИГУРАЦИЯ FIREBASE
+// ============================================
+const FIREBASE_URL = "https://test-45b25-default-rtdb.firebaseio.com";
+const FB_PATH = "ugolok";
+const SYNC_INTERVAL = 3000; // проверка изменений раз в 3 секунды
+
+// ============================================
+// ДАННЫЕ (дефолт — на случай чистой базы)
+// ============================================
+const DATA = {
+  chars: [
+    { id:"artem", nick:"Артём", name:"Дёмин Артём Юрьевич", group:"main", birth:"26.04.1986, 1:26", live:"г. Санкт-Петербург, Россия", height:"194\\90", health:"Анальгезия, аллергия на цитрусы", temperament:"Флегматик", attachment:"Надёжный", love:"Сейчас: Антон))", family:"Папа Юрий, мама Полина, сестра Алиса, племянник Олег", pet:"Лабрадор Максим", mbti:"ISTP", bank:"Сбербанк", phone:"7 (910) 551-02-01 (МТС)" },
+    { id:"toha", nick:"Тоха", name:"Веспер Антон Людвигович", group:"main", birth:"15.11.1992, 15:28", live:"г. Санкт-Петербург, Россия", height:"164\\59", health:"ХОБЛ", temperament:"Холерик", love:"Сейчас: Артём))", family:"Папа Людвиг, мама Кристина", pet:"Лабрадор Максим", mbti:"ISTP", bank:"Сбербанк", phone:"7 (911) 501-70-75 (МТС)" },
+    { id:"sasha", nick:"Саша", name:"Климов Александр Николаевич", group:"main", birth:"28.03.1995, 6:18", live:"г. Санкт-Петербург, Россия", height:"191\\73", health:"Аллергия на алоэ вера", temperament:"Меланхолик", love:"Сейчас: Вова))", family:"Папа Николай, мама Марина, сестра Екатерина, племянник Андрей", pet:"Кошка Серафима", transport:"Toyota Fortuner", plate:"С429ХС 98", bank:"АльфаБанк", phone:"7 (902) 454-01-12" },
+    { id:"vova", nick:"Вова", name:"Бестужев Владимир Олегович", group:"main", birth:"25.07.1998, 2:56", live:"г. Санкт-Петербург, Россия", height:"181\\74", health:"Аллергия на чеснок, кешью", temperament:"Сангвиник", love:"Сейчас: Саша))", family:"Папа Олег, мама Аля (X_X)", profession:"Автомеханик в тюнинг-ателье", transport:"Nissan 350Z", plate:"В531ОР 33", bank:"Сбербанк", phone:"7 (902) 539-28-32" },
+    { id:"renata", nick:"Рената", name:"Волконская Рената Алексеевна", group:"second", birth:"04.01.2001", live:"г. Санкт-Петербург, Россия", height:"170", profession:"Дизайнер, стайлинг", bank:"ВТБ" },
+    { id:"slava", nick:"Слава", name:"Загорецкий Станислав Сергеевич", group:"second", birth:"02.12.1999", live:"г. Санкт-Петербург, Россия", height:"186", bank:"ВТБ" },
+    { id:"emma", nick:"Эмма", name:"Музыченко Эмма", group:"second", birth:"07.07.1998" },
+    { id:"volodya", nick:"Володя", name:"Владимир", group:"second", live:"г. Санкт-Петербург, Россия", height:"187", profession:"Тату-мастер" },
+    { id:"ada", nick:"Ада", name:"Ада", group:"second", live:"г. Санкт-Петербург, Россия" },
+    { id:"sergey", nick:"Серж", name:"Сергей", group:"second", live:"г. Санкт-Петербург, Россия", height:"173", profession:"Психолог, работает в сексшопе", note:"друг Тохи" },
+    { id:"alyona", nick:"Алёна", name:"Алёна", group:"second", note:"встр с Ритой" },
+    { id:"rita", nick:"Рита", name:"Маргарита", group:"second", note:"встр с Алёной" },
+    { id:"katya", nick:"Катя", name:"Климова Екатерина Николаевна", group:"second", birth:"19.06.1991", note:"сестра Саши" },
+    { id:"andrey", nick:"Андрей", name:"Климов-Ростовской Андрей Викторович", group:"second", birth:"13.02.2014", note:"племянник Саши" },
+    { id:"anya", nick:"Аня", name:"Анна", group:"minor", note:"бывшая Тохи" },
+    { id:"ksyusha", nick:"Ксюша", name:"Ксения", group:"minor", note:"бывшая Артёма" },
+    { id:"olya", nick:"Оля", name:"Ольга Одоевская", group:"minor", note:"бывшая Саши и Вовы" },
+    { id:"kirill1", nick:"Кирилл", name:"Кирилл", group:"minor", note:"журналюга" },
+    { id:"david", nick:"Давид", name:"Давид", group:"minor", note:"журналюга" },
+    { id:"maya", nick:"Майя", name:"Майя", group:"minor", note:"журналюга" },
+    { id:"oleg", nick:"Олег", name:"Дёмин Олег Алексеевич", group:"school", birth:"26.07.2003", note:"встр с Настей" },
+    { id:"nastya", nick:"Настя", name:"Маковская Анастасия", group:"school", birth:"19.09.2003", note:"встр с Олегом" },
+    { id:"maxim", nick:"Максим", name:"Максим", group:"school", note:"без папы" },
+    { id:"kirill2", nick:"Кирилл", name:"Кирилл", group:"school", note:"без мамы" },
+    { id:"zhenya", nick:"Женя", name:"Евгений", group:"school" },
+    { id:"sasha2", nick:"Саша", name:"Александр", group:"school" },
+    { id:"vitya", nick:"Витя", name:"Лаврин Виктор Евгеньевич", group:"school", note:"приёмыш Володи и Ады" },
+    { id:"karina", nick:"Карина", name:"Карина", group:"school" },
+    { id:"katya2", nick:"Катя", name:"Екатерина", group:"school" },
+    { id:"alina", nick:"Алина", name:"Алина", group:"school" },
+    { id:"ilya", nick:"Илья", name:"Илья", group:"minor" },
+    { id:"kristina", nick:"Кристина", name:"Кристина", group:"minor" },
+    { id:"vins", nick:"Винс", name:"Винс", group:"fantasy" },
+    { id:"al", nick:"Ал", name:"Ал", group:"fantasy" }
+  ],
+  families: [
+    { name: "Семья Деминых", members: [
+      { nick:"Юра", name:"Дёмин Юрий Дмитриевич" },
+      { nick:"Полина", name:"Дёмина Полина Денисовна" },
+      { nick:"Артем", name:"Дёмин Артём Юрьевич" },
+      { nick:"Алиса", name:"Дёмина* Алиса Юрьевна", note:"*Пока не в браке с Лексом" },
+      { nick:"Лекс", name:"Уваров Алексей Георгиевич" },
+      { nick:"Олег", name:"Дёмин Олег Алексеевич" },
+      { nick:"Костик", name:"Уваров Константин Алексеевич" }
+    ]},
+    { name: "Семья Весперов", members: [
+      { nick:"Людвиг", birth:"1971", name:"Веспер Людвиг" },
+      { nick:"Кристина", birth:"1972", name:"Веспер Кристина Константиновна" },
+      { nick:"Антон", birth:"15.11.1992", name:"Веспер Антон Людвигович" }
+    ]},
+    { name: "Семья Климовых", members: [
+      { nick:"Николай", birth:"18.05.1969", name:"Климов Николай Александрович" },
+      { nick:"Марина", birth:"08.03.1971", name:"Климова (Ильина) Марина Павловна" },
+      { nick:"Катя", birth:"19.06.1991", name:"Климова Екатерина Николаевна" },
+      { nick:"Саша", birth:"28.03.1995", name:"Климов Александр Николаевич" },
+      { nick:"Виктор Р.", birth:"21.03.1990", name:"Ростовской Виктор Петрович" },
+      { nick:"Андрей", birth:"13.02.2014", name:"Климов-Ростовской Андрей Викторович" },
+      { nick:"Лиза", birth:"2026", name:"Климова-Ростовская Елизавета Викторовна" }
+    ]},
+    { name: "Семья Бестужевых", members: [
+      { nick:"Олег", birth:"05.10.1972", name:"Бестужев Олег Дмитриевич" },
+      { nick:"Аля", birth:"12.06.1973 (умерла 16.07.2018)", name:"Бестужева Алевтина Владимировна" },
+      { nick:"Вова", birth:"25.07.1998", name:"Бестужев Владимир Олегович" }
+    ]},
+    { name: "Семья Волконских", members: [
+      { nick:"Алексей", name:"Волконский Алексей" },
+      { nick:"Руслана", name:"Волконская Руслана" },
+      { nick:"Мирослав", name:"Волконский Мирослав Алексеевич" },
+      { nick:"Рената", name:"Волконская Рената Алексеевна" }
+    ]},
+    { name: "Семья Загорецких", members: [
+      { nick:"Оксана", name:"Загорецкая Оксана" },
+      { nick:"Сергей", name:"Загорецкий Сергей" },
+      { nick:"Слава", name:"Загорецкий Станислав Сергеевич" }
+    ]},
+    { name: "Семья Володи (пока без фамилии)", members: [
+      { nick:"Ада", name:"Чернигова (Гюнеш) Ада" },
+      { nick:"Володя", name:"Чернигов Владимир" },
+      { nick:"Дамир", name:"Чернигов Дамир Владимирович" },
+      { nick:"Витя", name:"Лаврин Виктор Евгеньевич" }
+    ]}
+  ],
+  watch: [
+    { id:"w1", title:"Дьявол носит Prada 2", type:"film" },
+    { id:"w2", title:"Дьявол носит Prada", type:"film" },
+    { id:"w3", title:"Константин: Повелитель тьмы", type:"film" },
+    { id:"w4", title:"Тачки", type:"cartoon" },
+    { id:"w5", title:"Интервью с вампиром", type:"film" },
+    { id:"w6", title:"Жаркое соперничество", type:"series" },
+    { id:"w7", title:"Интерны (досмотреть...)", type:"series" },
+    { id:"w8", title:"Гуд Оменс (1, 2 сезоны + полнометражка)", type:"series" },
+    { id:"w9", title:"Полицейский с Рублёвки", type:"series" }
+  ],
+  fics: [
+    { id:"fic1", title:"Все Аушки (Google Doc)", link:"https://docs.google.com/document/d/1CQdf4qpc5sclNwYR2J8INZO9D9RHPnDKmg8htE2SS18/edit?usp=sharing" }
+  ],
+  matrixCols: ["Саша","Вова","Артем","Тоха","Рената","Слава","Эмма","Володя","Лекс","Ада","Серж","Рита","Алёна","Николай","Марина","Катя","Виктор Р.","Андрей","Лиза","Аня","Ксюша","Оля","Мирон","Маша","Дамир","Витя","Карина","Максим","Кирилл","Женя","Алина","Юрий","Полина","Алиса","Костик","Людвиг","Кристина В.","Аля","Олег Б.","Руслана","Алексей В.","Мирослав","Сергей З.","Оксана"],
+  matrix: {}
+};
+
+const REL_COLORS = [
+  { code:"love",     color:"#f9a8d4", label:"любовь / ром. интерес" },
+  { code:"hate",     color:"#dc2626", label:"сильная неприязнь" },
+  { code:"tense",    color:"#fca5a5", label:"напряжённые / ссорятся" },
+  { code:"complex",  color:"#60a5fa", label:"сложные / любовь и ненависть" },
+  { code:"best",     color:"#86efac", label:"лучшие друзья" },
+  { code:"friend",   color:"#d9f99d", label:"дружба / хорошие" },
+  { code:"buddy",    color:"#a5f3fc", label:"приятели" },
+  { code:"neutral",  color:"#fef08a", label:"нейтрально / знакомы" },
+  { code:"indiff",   color:"#ddd6fe", label:"равнодушные" },
+  { code:"excl",     color:"#f472b6", label:"эксклюзивно" },
+  { code:"afraid",   color:"#16a34a", label:"избегает / боится" },
+  { code:"stranger", color:"#a78bfa", label:"не знакомы" },
+  { code:"none",     color:"",        label:"без цвета" }
+];
+
+const relToLetter = { "родственник":"р", "бывший":"б" };
+const _legacyRelations = [
+  { from:"Саша", to:"Николай", type:"родственник" },
+  { from:"Саша", to:"Марина", type:"родственник" },
+  { from:"Саша", to:"Катя", type:"родственник" },
+  { from:"Саша", to:"Андрей", type:"родственник" },
+  { from:"Вова", to:"Аля", type:"родственник" },
+  { from:"Вова", to:"Олег Б.", type:"родственник" },
+  { from:"Артем", to:"Юрий", type:"родственник" },
+  { from:"Артем", to:"Полина", type:"родственник" },
+  { from:"Артем", to:"Алиса", type:"родственник" },
+  { from:"Тоха", to:"Людвиг", type:"родственник" },
+  { from:"Тоха", to:"Кристина В.", type:"родственник" },
+  { from:"Аня", to:"Тоха", type:"бывший" },
+  { from:"Ксюша", to:"Артем", type:"бывший" },
+  { from:"Оля", to:"Саша", type:"бывший" },
+  { from:"Максим", to:"Кирилл", type:"бывший" },
+  { from:"Кирилл", to:"Максим", type:"бывший" }
+];
+_legacyRelations.forEach(r => {
+  DATA.matrix[r.from + "|" + r.to] = { color:"", letter: relToLetter[r.type] || "" };
+});
+
+const STORIES_DEFAULT = [
+  { id:"stream", title:"Стримерская AU", groups:["bestimovy"], tags:["AU"], text:"Вова (Бесовской) и Саша (Клим) стримеры абсолютно разных жанров." },
+  { id:"cinema", title:"Киношная AU", groups:["bestimovy"], tags:["AU"], text:"Вова молодой начинающий актер, Саша - оператор." },
+  { id:"supernatural", title:"Супернатуралы AU", groups:["bestimovy"], tags:["AU"], text:"У Вовы умирает мама, у Саши — Оля." },
+  { id:"school", title:"Школьники AU + доп.", groups:["bestimovy"], tags:["AU"], text:"Саша с Вовой одноклассники." },
+  { id:"actors", title:"Актёры AU", groups:["bestimovy"], tags:["AU"], text:"Саша актер главной роли в сериале." },
+  { id:"family", title:"Александра + Вова", groups:["bestimovy"], tags:["AU"], text:"У них двое деток: Сева и Влада." },
+  { id:"reverse", title:"Реверс AU (Вова коп, Саша гонщик)", groups:["bestimovy"], tags:["AU"], text:"Ааа эээ))" },
+  { id:"f1", title:"Формула 1 AU", groups:["bestimovy"], tags:["AU"], text:"Напарники в команде Формулы-1." },
+  { id:"bestimovy", title:"Бестимовы сюжетни (части 1-3)", groups:["bestimovy"], tags:["AU"], text:"[Полный текст — вставим позже.]" },
+  { id:"cat", title:"Кошка Бестимята", groups:["bestimovy"], tags:["AU"], text:"[Полный текст — вставим позже.]" },
+  { id:"andrey", title:"Андрей Бестимята", groups:["bestimovy"], tags:["AU"], text:"[Полный текст — вставим позже.]" },
+  { id:"vypusk", title:"Выпуск Школьники Бестимята", groups:["bestimovy"], tags:["AU"], text:"[Полный текст — вставим позже.]" },
+  { id:"syrok", title:"Сырок Бестимята", groups:["bestimovy"], tags:["AU"], text:"[Полный текст — вставим позже.]" },
+  { id:"ashes", title:"Ашес Бестимята", groups:["bestimovy"], tags:["AU"], text:"[Полный текст — вставим позже.]" },
+  { id:"artons", title:"Артоны и Максэм", groups:["artons"], tags:[], text:"[Полный текст — вставим позже.]" },
+  { id:"pony", title:"Пони таун эрпе (GTA5 RP)", groups:["other"], tags:["18+"], text:"[18+ — вставим позже.]" }
+];
+
+const STORY_GROUPS = {
+  bestimovy: { label: "Бестимовы", order: 1 },
+  artons:    { label: "Артоны",    order: 2 },
+  other:     { label: "Другое",    order: 3 }
+};
+
+// ============================================
+// СОСТОЯНИЕ
+// ============================================
+const LS_KEY = "nash-ugolok-v3";
+const LS_MIGRATED = "nash-ugolok-migrated-to-fb"; // флаг, что уже залили в облако
+
+let DB = {
+  chars: [], families: [], watch: [], fics: [],
+  matrix: {}, matrixCols: DATA.matrixCols.slice(),
+  trees: [], stories: []
+};
+
+let _lastRemoteJSON = ""; // последняя полученная из облака версия (для сравнения)
+let _syncStatus = "loading"; // loading | on | syncing | off
+
+// Миграция старых историй group → groups
+function migrateStory(s){
+  if(s.groups && Array.isArray(s.groups)) return s;
+  const groups = s.group ? [s.group] : ['other'];
+  const { group, ...rest } = s;
+  return { ...rest, groups };
+}
+
+// Загрузка из localStorage (как временный кэш)
+function loadFromLocal(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw){
+    try{
+      const p = JSON.parse(raw);
+      return {
+        chars: p.chars || JSON.parse(JSON.stringify(DATA.chars)),
+        families: p.families || JSON.parse(JSON.stringify(DATA.families)),
+        watch: p.watch || JSON.parse(JSON.stringify(DATA.watch)),
+        fics: p.fics || JSON.parse(JSON.stringify(DATA.fics)),
+        matrix: p.matrix || JSON.parse(JSON.stringify(DATA.matrix)),
+        matrixCols: p.matrixCols || DATA.matrixCols.slice(),
+        trees: p.trees || [],
+        stories: (p.stories ? p.stories.map(migrateStory) : JSON.parse(JSON.stringify(STORIES_DEFAULT)))
+      };
+    }catch(e){}
+  }
+  return {
+    chars: JSON.parse(JSON.stringify(DATA.chars)),
+    families: JSON.parse(JSON.stringify(DATA.families)),
+    watch: JSON.parse(JSON.stringify(DATA.watch)),
+    fics: JSON.parse(JSON.stringify(DATA.fics)),
+    matrix: JSON.parse(JSON.stringify(DATA.matrix)),
+    matrixCols: DATA.matrixCols.slice(),
+    trees: [],
+    stories: JSON.parse(JSON.stringify(STORIES_DEFAULT))
+  };
+}
+
+function saveToLocal(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+  }catch(e){}
+}
+
+// ============================================
+// FIREBASE REST API
+// ============================================
+// Firebase запрещает . $ # [ ] / в ключах объектов.
+// Кодируем их при отправке, декодируем при получении.
+
+function encodeKeys(obj){
+  if(obj === null || obj === undefined) return obj;
+  if(Array.isArray(obj)) return obj.map(encodeKeys);
+  if(typeof obj !== "object") return obj;
+  const out = {};
+  for(const k of Object.keys(obj)){
+    const safeKey = String(k)
+      .replace(/\./g, "·DOT·")
+      .replace(/\$/g, "·DOL·")
+      .replace(/#/g, "·HSH·")
+      .replace(/\[/g, "·LB·")
+      .replace(/\]/g, "·RB·")
+      .replace(/\//g, "·SL·");
+    out[safeKey] = encodeKeys(obj[k]);
+  }
+  return out;
+}
+
+function decodeKeys(obj){
+  if(obj === null || obj === undefined) return obj;
+  if(Array.isArray(obj)) return obj.map(decodeKeys);
+  if(typeof obj !== "object") return obj;
+  const out = {};
+  for(const k of Object.keys(obj)){
+    const realKey = String(k)
+      .replace(/·DOT·/g, ".")
+      .replace(/·DOL·/g, "$")
+      .replace(/·HSH·/g, "#")
+      .replace(/·LB·/g, "[")
+      .replace(/·RB·/g, "]")
+      .replace(/·SL·/g, "/");
+    out[realKey] = decodeKeys(obj[k]);
+  }
+  return out;
+}
+
+async function fbFetch(){
+  const r = await fetch(FIREBASE_URL + "/" + FB_PATH + ".json");
+  if(!r.ok) throw new Error("FB fetch failed");
+  const data = await r.json();
+  return decodeKeys(data);
+}
+
+async function fbPut(data){
+  const r = await fetch(FIREBASE_URL + "/" + FB_PATH + ".json", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(encodeKeys(data))
+  });
+  if(!r.ok) throw new Error("FB put failed");
+  return await r.json();
+}
+
+// Статус синхронизации
+function setSyncStatus(status){
+  _syncStatus = status;
+  const dot = document.getElementById("syncDot");
+  const text = document.getElementById("syncText");
+  if(!dot || !text) return;
+  dot.className = "sync-dot";
+  if(status === "on"){ dot.classList.add("on"); text.textContent = "Синхронизировано"; }
+  else if(status === "syncing"){ dot.classList.add("syncing"); text.textContent = "Синхронизация..."; }
+  else if(status === "off"){ dot.classList.add("off"); text.textContent = "Нет связи"; }
+  else { text.textContent = "Загрузка..."; }
+
+  const info = document.getElementById("settingsSyncInfo");
+  if(info){
+    const now = new Date().toLocaleTimeString("ru-RU");
+    let label = "—";
+    if(status === "on") label = "🟢 Всё синхронизировано";
+    else if(status === "syncing") label = "🟡 Идёт синхронизация";
+    else if(status === "off") label = "🔴 Нет связи с облаком";
+    else label = "⏳ Первая загрузка";
+    info.innerHTML = `${label}<br>Последняя проверка: ${now}<br>URL: <code style="font-size:11px">${FIREBASE_URL}/${FB_PATH}</code>`;
+  }
+}
+
+// Проверка: изменилось ли что-то на сервере
+function remoteChanged(remoteData){
+  const remoteJSON = JSON.stringify(remoteData || {});
+  if(remoteJSON === _lastRemoteJSON) return false;
+  _lastRemoteJSON = remoteJSON;
+  return true;
+}
+
+// Основной цикл синхронизации
+async function syncLoop(){
+  try{
+    setSyncStatus("syncing");
+    const remote = await fbFetch();
+
+    // Первая загрузка: если облако пустое — заливаем локальные данные
+    if(!remote){
+      const migrated = localStorage.getItem(LS_MIGRATED);
+      const local = loadFromLocal();
+      if(!migrated){
+        console.log("Firebase пустой — заливаем локальные данные");
+        await fbPut(local);
+        localStorage.setItem(LS_MIGRATED, "1");
+        DB = local;
+        saveToLocal();
+        renderAll();
+        _lastRemoteJSON = JSON.stringify(local);
+        setSyncStatus("on");
+        return;
+      } else {
+        // Уже мигрировали, но облако пустое (кто-то стёр?) — заливаем то что есть в DB
+        await fbPut(DB);
+        _lastRemoteJSON = JSON.stringify(DB);
+        setSyncStatus("on");
+        return;
+      }
+    }
+
+    // Сравниваем с последним известным
+    if(remoteChanged(remote)){
+      DB = {
+        chars: remote.chars || [],
+        families: remote.families || [],
+        watch: remote.watch || [],
+        fics: remote.fics || [],
+        matrix: remote.matrix || {},
+        matrixCols: remote.matrixCols || DATA.matrixCols.slice(),
+        trees: remote.trees || [],
+        stories: (remote.stories || []).map(migrateStory)
+      };
+      saveToLocal();
+      renderAll();
+    }
+    setSyncStatus("on");
+  }catch(e){
+    console.warn("Sync error:", e);
+    setSyncStatus("off");
+  }
+}
+
+// Сохранение — сначала в локаль, потом в облако
+async function save(){
+  saveToLocal();
+  setSyncStatus("syncing");
+  try{
+    await fbPut(DB);
+    _lastRemoteJSON = JSON.stringify(DB);
+    setSyncStatus("on");
+  }catch(e){
+    console.warn("Save to FB failed:", e);
+    setSyncStatus("off");
+  }
+}
+
+// Кнопки в настройках
+async function forceSync(){
+  _lastRemoteJSON = "";
+  await syncLoop();
+}
+async function forceUpload(){
+  if(!confirm("Залить локальные данные в облако? Данные из облака будут перезаписаны.")) return;
+  setSyncStatus("syncing");
+  try{
+    await fbPut(DB);
+    _lastRemoteJSON = JSON.stringify(DB);
+    setSyncStatus("on");
+    alert("Залито в облако ✅");
+  }catch(e){
+    setSyncStatus("off");
+    alert("Ошибка: " + e.message);
+  }
+}
+async function forceDownload(){
+  if(!confirm("Скачать данные из облака? Локальные изменения будут потеряны.")) return;
+  setSyncStatus("syncing");
+  try{
+    const remote = await fbFetch();
+    if(!remote){ alert("Облако пустое"); setSyncStatus("on"); return; }
+    DB = {
+      chars: remote.chars || [],
+      families: remote.families || [],
+      watch: remote.watch || [],
+      fics: remote.fics || [],
+      matrix: remote.matrix || {},
+      matrixCols: remote.matrixCols || DATA.matrixCols.slice(),
+      trees: remote.trees || [],
+      stories: (remote.stories || []).map(migrateStory)
+    };
+    saveToLocal();
+    _lastRemoteJSON = JSON.stringify(remote);
+    renderAll();
+    setSyncStatus("on");
+    alert("Скачано из облака ✅");
+  }catch(e){
+    setSyncStatus("off");
+    alert("Ошибка: " + e.message);
+  }
+}
+
+// Утилиты
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const esc = s => (s||'').toString().replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const closeModal = id => document.getElementById(id).classList.remove('active');
+
+function calcAge(birthStr){
+  if(!birthStr) return null;
+  const m = String(birthStr).match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+  if(!m) return null;
+  const day = +m[1], month = +m[2] - 1, year = +m[3];
+  const bd = new Date(year, month, day);
+  if(isNaN(bd.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - bd.getFullYear();
+  const beforeBirthday = (today.getMonth() < bd.getMonth()) || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate());
+  if(beforeBirthday) age--;
+  return age >= 0 && age < 150 ? age : null;
+}
+function getAge(c){
+  const fromDate = calcAge(c.birth);
+  if(fromDate !== null) return { n: fromDate, auto: true };
+  if(c.age) return { n: c.age, auto: false };
+  return null;
+}
+
+function applyTheme(theme){
+  if(theme === 'dark') document.body.classList.add('theme-dark');
+  else document.body.classList.remove('theme-dark');
+  const label = document.getElementById('themeLabel');
+  if(label) label.textContent = theme === 'dark' ? 'Светлая' : 'Тёмная';
+  localStorage.setItem('nash-ugolok-theme', theme);
+}
+function initTheme(){
+  const saved = localStorage.getItem('nash-ugolok-theme') || 'light';
+  applyTheme(saved);
+  const btn = document.getElementById('themeToggle');
+  if(btn){
+    btn.onclick = () => {
+      const isDark = document.body.classList.contains('theme-dark');
+      applyTheme(isDark ? 'light' : 'dark');
+    };
+  }
+}
+
+document.querySelectorAll('.nav-item').forEach(n=>{
+  n.onclick = () => {
+    if(!n.dataset.tab) return;
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    n.classList.add('active');
+    document.getElementById(n.dataset.tab).classList.add('active');
+  };
+});
+
+const GROUP_LABELS = { main:"Основные", second:"Вторые основные", minor:"Второстепенные", school:"Школьники", fantasy:"Фэнтези" };
+const STATUS_LABELS = { idea:"Идея", draft:"Черновик", done:"Готово" };
+
+let charFilter = "all";
+function renderChars(){
+  const bar = document.getElementById('charFilters');
+  bar.innerHTML = `<button class="filter-btn ${charFilter==='all'?'active':''}" data-cf="all">Все</button>` +
+    Object.entries(GROUP_LABELS).map(([k,v])=>`<button class="filter-btn ${charFilter===k?'active':''}" data-cf="${k}">${v}</button>`).join('');
+  bar.querySelectorAll('.filter-btn').forEach(b=>{ b.onclick = () => { charFilter = b.dataset.cf; renderChars(); }; });
+  const grid = document.getElementById('charsGrid');
+  let list = DB.chars;
+  if(charFilter !== 'all') list = list.filter(c => c.group === charFilter);
+  if(!list.length){ grid.innerHTML = '<div class="empty">Пусто</div>'; return; }
+  grid.innerHTML = list.map(c => {
+    const a = getAge(c);
+    return `
+    <div class="card" onclick="openCharModal('${c.id}')">
+      <div class="nick">${esc(c.nick || '')}</div>
+      <h3>${esc(c.name || '')}</h3>
+      ${c.note ? `<p>${esc(c.note)}</p>` : ''}
+      <div class="tags">
+        ${c.group ? `<span class="tag">${GROUP_LABELS[c.group]||c.group}</span>`:''}
+        ${a ? `<span class="tag" title="${a.auto?'вычислено из даты рождения':'указано вручную'}">${a.n} лет</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let _charModalCurrentId = null;
+function openCharModal(id){
+  const c = DB.chars.find(x=>x.id===id); if(!c) return;
+  _charModalCurrentId = id;
+  document.getElementById('charModalTitle').textContent = (c.nick?c.nick+' — ':'') + (c.name||'');
+  const a = getAge(c);
+  const rows = [
+    ['Группа', GROUP_LABELS[c.group]||c.group],
+    ['Возраст', a ? `${a.n} лет${a.auto ? ' (вычислено)' : ''}` : null],
+    ['Дата рождения', c.birth],
+    ['Место рождения', c.birthPlace], ['Место жительства', c.live], ['Рост\\вес', c.height],
+    ['Здоровье', c.health], ['Внешность', c.appearance], ['Темперамент', c.temperament],
+    ['Привычки', c.habits], ['Тип привязанности', c.attachment], ['Проявления любви', c.loveType],
+    ['Любовный интерес', c.love], ['Семья', c.family], ['Друзья', c.friends], ['Враги', c.enemies],
+    ['Профессия', c.profession], ['Питомец', c.pet], ['Хобби', c.hobby], ['Транспорт', c.transport],
+    ['Номер', c.plate], ['Любимые места', c.places], ['Стиль', c.style], ['Тип личности', c.mbti],
+    ['Банк', c.bank], ['Телефон', c.phone], ['Заметки', c.note], ['Доп.', c.extra]
+  ].filter(([_,v]) => v);
+  document.getElementById('charModalBody').innerHTML = rows.length
+    ? rows.map(([k,v])=>`<div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px"><div style="color:var(--muted);min-width:140px;flex-shrink:0;font-weight:500">${esc(k)}</div><div style="flex:1;color:var(--text)">${esc(v)}</div></div>`).join('')
+    : '<div class="empty">Нет данных</div>';
+  document.getElementById('charModalEditBtn').onclick = () => openCharEdit(id);
+  document.getElementById('charModal').classList.add('active');
+}
+
+function openCharEdit(id){
+  const c = id ? DB.chars.find(x=>x.id===id) : null;
+  document.getElementById('charEditTitle').textContent = c ? 'Редактировать персонажа' : 'Новый персонаж';
+  document.getElementById('charEditId').value = c ? c.id : '';
+  const setV = (elId, val) => { const el = document.getElementById(elId); if(el) el.value = val || ''; };
+  setV('charEditNick', c?.nick); setV('charEditName', c?.name);
+  setV('charEditGroup', c?.group || 'main');
+  setV('charEditBirth', c?.birth); setV('charEditAge', c?.age);
+  setV('charEditBirthPlace', c?.birthPlace); setV('charEditLive', c?.live);
+  setV('charEditHeight', c?.height); setV('charEditHealth', c?.health);
+  setV('charEditAppearance', c?.appearance); setV('charEditTemperament', c?.temperament);
+  setV('charEditHabits', c?.habits); setV('charEditAttachment', c?.attachment);
+  setV('charEditLoveType', c?.loveType); setV('charEditLove', c?.love);
+  setV('charEditFamily', c?.family); setV('charEditFriends', c?.friends);
+  setV('charEditEnemies', c?.enemies); setV('charEditProfession', c?.profession);
+  setV('charEditPet', c?.pet); setV('charEditHobby', c?.hobby);
+  setV('charEditTransport', c?.transport); setV('charEditPlate', c?.plate);
+  setV('charEditPlaces', c?.places); setV('charEditStyle', c?.style);
+  setV('charEditMbti', c?.mbti); setV('charEditBank', c?.bank);
+  setV('charEditPhone', c?.phone); setV('charEditNote', c?.note);
+  setV('charEditExtra', c?.extra);
+  closeModal('charModal');
+  document.getElementById('charEditModal').classList.add('active');
+}
+
+function saveCharEdit(){
+  const nick = document.getElementById('charEditNick').value.trim();
+  if(!nick) return alert('Введи кличку');
+  const getV = id => document.getElementById(id)?.value.trim() || '';
+  const data = {
+    id: document.getElementById('charEditId').value || uid(),
+    nick, name: getV('charEditName'), group: getV('charEditGroup') || 'main',
+    birth: getV('charEditBirth'), age: getV('charEditAge') ? +getV('charEditAge') : null,
+    birthPlace: getV('charEditBirthPlace'), live: getV('charEditLive'),
+    height: getV('charEditHeight'), health: getV('charEditHealth'),
+    appearance: getV('charEditAppearance'), temperament: getV('charEditTemperament'),
+    habits: getV('charEditHabits'), attachment: getV('charEditAttachment'),
+    loveType: getV('charEditLoveType'), love: getV('charEditLove'),
+    family: getV('charEditFamily'), friends: getV('charEditFriends'),
+    enemies: getV('charEditEnemies'), profession: getV('charEditProfession'),
+    pet: getV('charEditPet'), hobby: getV('charEditHobby'),
+    transport: getV('charEditTransport'), plate: getV('charEditPlate'),
+    places: getV('charEditPlaces'), style: getV('charEditStyle'),
+    mbti: getV('charEditMbti'), bank: getV('charEditBank'),
+    phone: getV('charEditPhone'), note: getV('charEditNote'),
+    extra: getV('charEditExtra')
+  };
+  Object.keys(data).forEach(k => { if(data[k] === '' || data[k] === null) delete data[k]; });
+  data.id = document.getElementById('charEditId').value || data.id;
+  data.nick = nick; data.group = data.group || 'main';
+  const i = DB.chars.findIndex(x => x.id === data.id);
+  if(i >= 0) DB.chars[i] = data; else DB.chars.push(data);
+  save(); renderChars(); updateCounts();
+  closeModal('charEditModal');
+}
+
+function deleteCharFromModal(){
+  if(!_charModalCurrentId) return;
+  const c = DB.chars.find(x=>x.id===_charModalCurrentId);
+  if(!c) return;
+  if(!confirm(`Удалить персонажа «${c.nick}»?`)) return;
+  DB.chars = DB.chars.filter(x => x.id !== _charModalCurrentId);
+  save(); renderChars(); updateCounts(); closeModal('charModal');
+}
+
+function renderFamilies(){
+  const el = document.getElementById('familiesList');
+  if(!DB.families.length){ el.innerHTML='<div class="empty">Пусто</div>'; return; }
+  el.innerHTML = DB.families.map((f, idx) => `
+    <div class="family-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h3>${esc(f.name)}</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="openFamilyEdit(${idx})">Изменить</button>
+          <button class="btn btn-ghost btn-sm btn-danger" onclick="deleteFamily(${idx})">Удалить</button>
+        </div>
+      </div>
+      <div class="family-list">
+        ${(f.members||[]).map(m=>`
+          <div class="family-row">
+            <div class="nm">${esc(m.nick||'')}</div>
+            <div class="full">${esc(m.name||'')}${m.birth?` · ${esc(m.birth)}`:''}${m.note?` · <i>${esc(m.note)}</i>`:''}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function openFamilyEdit(idx){
+  const f = (idx !== undefined && idx !== null) ? DB.families[idx] : null;
+  document.getElementById('familyEditTitle').textContent = f ? 'Редактировать семью' : 'Новая семья';
+  document.getElementById('familyEditId').value = (f ? idx : '');
+  document.getElementById('familyEditName').value = f ? f.name : '';
+  document.getElementById('familyMembersList').innerHTML = '';
+  if(f && f.members && f.members.length){ f.members.forEach(m => addFamilyMemberRow(m)); }
+  else { addFamilyMemberRow(); }
+  document.getElementById('familyEditModal').classList.add('active');
+}
+function addFamilyMemberRow(data){
+  const wrap = document.getElementById('familyMembersList');
+  const row = document.createElement('div');
+  row.className = 'family-member-row';
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 2fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
+  row.innerHTML = `
+    <input class="fm-nick" placeholder="Ник" value="${data?.nick?esc(data.nick):''}" style="padding:8px 10px;font-size:13px;margin:0">
+    <input class="fm-name" placeholder="ФИО" value="${data?.name?esc(data.name):''}" style="padding:8px 10px;font-size:13px;margin:0">
+    <input class="fm-birth" placeholder="Д.р." value="${data?.birth?esc(data.birth):''}" style="padding:8px 10px;font-size:13px;margin:0">
+    <button class="btn btn-ghost btn-sm" onclick="this.parentElement.remove()" style="padding:8px 12px">✕</button>
+    <input class="fm-note" placeholder="Примечание" value="${data?.note?esc(data.note):''}" style="grid-column:1/-1;padding:8px 10px;font-size:13px;margin:0">
+  `;
+  wrap.appendChild(row);
+}
+function saveFamilyEdit(){
+  const name = document.getElementById('familyEditName').value.trim();
+  if(!name) return alert('Введи название семьи');
+  const members = [];
+  document.querySelectorAll('#familyMembersList .family-member-row').forEach(row => {
+    const nick = row.querySelector('.fm-nick').value.trim();
+    const fullName = row.querySelector('.fm-name').value.trim();
+    const birth = row.querySelector('.fm-birth').value.trim();
+    const note = row.querySelector('.fm-note').value.trim();
+    if(nick || fullName){
+      const m = { nick, name: fullName };
+      if(birth) m.birth = birth;
+      if(note) m.note = note;
+      members.push(m);
+    }
+  });
+  const data = { name, members };
+  const idVal = document.getElementById('familyEditId').value;
+  if(idVal !== '') DB.families[+idVal] = data;
+  else DB.families.push(data);
+  save(); renderFamilies(); updateCounts();
+  closeModal('familyEditModal');
+}
+function deleteFamily(idx){
+  if(!confirm('Удалить семью?')) return;
+  DB.families.splice(idx, 1);
+  save(); renderFamilies(); updateCounts();
+}
+
+function renderTrees(){
+  const grid = document.getElementById('treesGrid');
+  if(!DB.trees.length){ grid.innerHTML = '<div class="empty">Пока ни одной схемы. Загрузи картинку выше.</div>'; return; }
+  grid.innerHTML = DB.trees.map((t, idx) => `
+    <div class="tree-card" onclick="openLightbox('${t.id}')">
+      <div class="tree-actions">
+        <button onclick="event.stopPropagation();renameTree(${idx})">Переименовать</button>
+        <button onclick="event.stopPropagation();deleteTree(${idx})">Удалить</button>
+      </div>
+      <img src="${t.data}" alt="${esc(t.name)}">
+      <div class="tree-title">${esc(t.name)}</div>
+    </div>`).join('');
+}
+function renameTree(idx){
+  const t = DB.trees[idx];
+  const newName = prompt('Новое название:', t.name);
+  if(newName && newName.trim()){ t.name = newName.trim(); save(); renderTrees(); }
+}
+function deleteTree(idx){
+  if(!confirm('Удалить схему?')) return;
+  DB.trees.splice(idx, 1);
+  save(); renderTrees(); updateCounts();
+}
+function handleTreeFiles(files){
+  Array.from(files).forEach(file => {
+    if(!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      DB.trees.push({ id: uid(), name: file.name.replace(/\.[^.]+$/, ''), data: e.target.result });
+      save(); renderTrees(); updateCounts();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function openLightbox(id){
+  const t = DB.trees.find(x => x.id === id);
+  if(!t) return;
+  document.getElementById('lightboxImg').src = t.data;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('active'); }
+
+let selectedColor = "love";
+let selectedLetter = "";
+let matrixSize = localStorage.getItem('matrix-size') || 'normal';
+
+function setMatrixSize(size){
+  matrixSize = size;
+  localStorage.setItem('matrix-size', size);
+  document.querySelectorAll('.zoom-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.size === size);
+  });
+  const tbl = document.querySelector('.matrix');
+  if(tbl){
+    tbl.classList.remove('size-compact','size-normal','size-large');
+    tbl.classList.add('size-' + size);
+  }
+}
+function fitMatrix(){
+  const wrap = document.getElementById('matrixWrap');
+  const tbl = document.querySelector('.matrix');
+  if(!tbl) return;
+  setMatrixSize('compact');
+  const availW = wrap.clientWidth - 20;
+  if(tbl.scrollWidth > availW){ tbl.style.fontSize = '10px'; }
+  else { tbl.style.fontSize = ''; }
+}
+
+function renderPickers(){
+  const cp = document.getElementById('colorPicker');
+  cp.innerHTML = REL_COLORS.map(c => `
+    <div class="pick-swatch ${c.code==='none'?'none':''} ${selectedColor===c.code?'active':''}"
+         style="${c.color?`background:${c.color}`:''}"
+         data-color="${c.code}" title="${esc(c.label)}">
+      ${c.code==='none'?'✕':''}
+    </div>`).join('');
+  cp.querySelectorAll('.pick-swatch').forEach(el => {
+    el.onclick = () => { selectedColor = el.dataset.color; renderPickers(); updateHint(); };
+  });
+  const lp = document.getElementById('letterPicker');
+  const letters = [
+    { code:"",   label:"— (без буквы)" },
+    { code:"р",  label:"р — родственники" },
+    { code:"б",  label:"б — бывший/ая" }
+  ];
+  lp.innerHTML = letters.map(l => `
+    <div class="pick-letter ${selectedLetter===l.code?'active':''}" data-letter="${l.code}" title="${esc(l.label)}">
+      ${l.code || '—'}
+    </div>`).join('');
+  lp.querySelectorAll('.pick-letter').forEach(el => {
+    el.onclick = () => { selectedLetter = el.dataset.letter; renderPickers(); updateHint(); };
+  });
+}
+function updateHint(){
+  const colorName = REL_COLORS.find(c=>c.code===selectedColor);
+  const colorLabel = colorName?.label || '—';
+  const letterLabel = selectedLetter ? `«${selectedLetter}»` : 'без буквы';
+  document.getElementById('pickerHint').innerHTML =
+    `Цвет: <b>${esc(colorLabel)}</b> · Буква: <b>${esc(letterLabel)}</b><br>
+     Клик по клетке — применить. ПКМ — стереть полностью.`;
+}
+function renderMatrix(){
+  const wrap = document.getElementById('matrixWrap');
+  const cols = DB.matrixCols;
+  let html = '<table class="matrix size-' + matrixSize + '"><thead><tr><th class="corner"></th>';
+  cols.forEach((name, i) => { html += `<th data-col="${i}" title="${esc(name)}">${esc(name)}</th>`; });
+  html += '</tr></thead><tbody>';
+  cols.forEach((rowName, r) => {
+    html += `<tr data-row="${r}"><th title="${esc(rowName)}">${esc(rowName)}</th>`;
+    cols.forEach((colName, c) => {
+      if(r === c){ html += `<td class="cell diag"></td>`; }
+      else {
+        const key = rowName + "|" + colName;
+        const val = DB.matrix[key] || {};
+        const colorDef = val.color ? REL_COLORS.find(x=>x.code===val.color) : null;
+        const bg = colorDef && colorDef.color ? colorDef.color : "transparent";
+        const letter = val.letter || "";
+        const darkColors = ["#dc2626","#16a34a","#1c1917"];
+        const letterClass = (colorDef && darkColors.includes(colorDef.color)) ? "letter on-color" : "letter";
+        html += `<td class="cell" data-key="${esc(key)}" data-row="${r}" data-col="${c}" style="background:${bg}">${letter ? `<span class="${letterClass}">${esc(letter)}</span>` : ''}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  document.querySelectorAll('.zoom-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.size === matrixSize);
+  });
+
+  wrap.querySelectorAll('.cell:not(.diag)').forEach(cell => {
+    cell.onclick = () => {
+      const key = cell.dataset.key;
+      const newColor = (selectedColor === 'none') ? "" : selectedColor;
+      const newLetter = selectedLetter;
+      if(!newColor && !newLetter) delete DB.matrix[key];
+      else DB.matrix[key] = { color:newColor, letter:newLetter };
+      save();
+      const colorDef = newColor ? REL_COLORS.find(x=>x.code===newColor) : null;
+      const bg = colorDef && colorDef.color ? colorDef.color : "transparent";
+      const darkColors = ["#dc2626","#16a34a","#1c1917"];
+      const letterClass = (colorDef && darkColors.includes(colorDef.color)) ? "letter on-color" : "letter";
+      cell.style.background = bg;
+      cell.innerHTML = newLetter ? `<span class="${letterClass}">${esc(newLetter)}</span>` : '';
+      updateCounts();
+    };
+    cell.oncontextmenu = (e) => {
+      e.preventDefault();
+      delete DB.matrix[cell.dataset.key];
+      save();
+      cell.style.background = 'transparent';
+      cell.innerHTML = '';
+      updateCounts();
+    };
+    cell.onmouseenter = () => {
+      const r = +cell.dataset.row, c = +cell.dataset.col;
+      wrap.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
+      wrap.querySelectorAll(`tbody tr[data-row="${r}"]`).forEach(tr=>tr.classList.add('hl'));
+      wrap.querySelectorAll(`thead th[data-col="${c}"]`).forEach(th=>th.classList.add('hl'));
+    };
+  });
+  const tbl = wrap.querySelector('table');
+  if(tbl) tbl.onmouseleave = () => wrap.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
+
+  const searchInput = document.getElementById('matrixSearch');
+  if(searchInput && searchInput.value) filterMatrix(searchInput.value);
+}
+
+function filterMatrix(query){
+  const wrap = document.getElementById('matrixWrap');
+  wrap.querySelectorAll('.search-hit').forEach(x => x.classList.remove('search-hit'));
+  if(!query || !query.trim()) return;
+  const q = query.trim().toLowerCase();
+  const cols = DB.matrixCols;
+  wrap.querySelectorAll('tbody th').forEach((th, i) => {
+    if(cols[i] && cols[i].toLowerCase().includes(q)) th.classList.add('search-hit');
+  });
+  wrap.querySelectorAll('thead th').forEach((th, i) => {
+    const idx = i - 1;
+    if(idx >= 0 && cols[idx] && cols[idx].toLowerCase().includes(q)) th.classList.add('search-hit');
+  });
+  if(q === 'р' || q === 'б'){
+    wrap.querySelectorAll('.cell:not(.diag)').forEach(cell => {
+      const val = DB.matrix[cell.dataset.key] || {};
+      if(val.letter === q) cell.classList.add('search-hit');
+    });
+  }
+}
+
+function renderFics(){
+  const grid = document.getElementById('ficsGrid');
+  if(!DB.fics.length){ grid.innerHTML='<div class="empty">Пусто. Добавь первую зарисовку</div>'; return; }
+  grid.innerHTML = DB.fics.map(f=>{
+    const st = f.status || 'idea';
+    return `
+    <div class="card" onclick="openFicView('${f.id}')">
+      <button class="btn-del" onclick="event.stopPropagation();delFic('${f.id}')">✕</button>
+      <h3>${esc(f.title)}</h3>
+      ${f.author?`<div class="author">by ${esc(f.author)}</div>`:''}
+      ${f.note?`<p>${esc(f.note)}</p>`:''}
+      <div class="tags">
+        <span class="tag">${STATUS_LABELS[st]}</span>
+        ${(f.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openFicModal('${f.id}')">Изменить</button>
+        ${f.link?`<button class="btn btn-sm" onclick="event.stopPropagation();window.open('${esc(f.link)}','_blank')">Открыть →</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function openFicView(id){
+  const f = DB.fics.find(x=>x.id===id); if(!f) return;
+  const st = f.status || 'idea';
+  document.getElementById('ficViewTitle').textContent = f.title;
+  document.getElementById('ficViewMeta').innerHTML = [f.author?`Автор: ${esc(f.author)}`:'', STATUS_LABELS[st], ...(f.tags||[])].filter(Boolean).join(' · ');
+  document.getElementById('ficViewBody').innerHTML = f.note ? `<div style="font-size:14.5px;line-height:1.7;color:var(--text-soft)">${esc(f.note)}</div>` : `<div class="empty">Нет заметки</div>`;
+  const linkBtn = document.getElementById('ficOpenLink');
+  if(f.link){ linkBtn.style.display=''; linkBtn.onclick = () => window.open(f.link, '_blank'); }
+  else { linkBtn.style.display='none'; }
+  document.getElementById('ficViewModal').classList.add('active');
+}
+function openFicModal(id){
+  const m = document.getElementById('ficModal');
+  if(id){
+    const f = DB.fics.find(x=>x.id===id);
+    document.getElementById('ficModalTitle').textContent = 'Изменить зарисовку';
+    document.getElementById('ficId').value = f.id;
+    document.getElementById('ficTitle').value = f.title || '';
+    document.getElementById('ficLink').value = f.link || '';
+    document.getElementById('ficAuthor').value = f.author || '';
+    document.getElementById('ficStatus').value = f.status || 'idea';
+    document.getElementById('ficTags').value = (f.tags||[]).join(', ');
+    document.getElementById('ficNote').value = f.note || '';
+  } else {
+    document.getElementById('ficModalTitle').textContent = 'Новая зарисовка';
+    document.getElementById('ficId').value = '';
+    ['ficTitle','ficLink','ficAuthor','ficTags','ficNote'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('ficStatus').value = 'idea';
+  }
+  m.classList.add('active');
+}
+function saveFic(){
+  const title = document.getElementById('ficTitle').value.trim();
+  if(!title) return alert('Введи название');
+  const data = {
+    id: document.getElementById('ficId').value || uid(),
+    title,
+    link: document.getElementById('ficLink').value.trim(),
+    author: document.getElementById('ficAuthor').value.trim(),
+    status: document.getElementById('ficStatus').value,
+    tags: document.getElementById('ficTags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    note: document.getElementById('ficNote').value.trim()
+  };
+  const i = DB.fics.findIndex(f=>f.id===data.id);
+  if(i>=0) DB.fics[i] = data; else DB.fics.push(data);
+  save(); renderFics(); updateCounts(); closeModal('ficModal');
+}
+function delFic(id){ if(!confirm('Удалить зарисовку?')) return; DB.fics = DB.fics.filter(f=>f.id!==id); save(); renderFics(); updateCounts(); }
+
+function renderStories(){
+  const container = document.getElementById('storiesContainer');
+  const grouped = {};
+  Object.keys(STORY_GROUPS).forEach(g => grouped[g] = []);
+  DB.stories.forEach(s => {
+    let groups = Array.isArray(s.groups) ? s.groups.slice() : (s.group ? [s.group] : []);
+    if(!groups.length) groups = ['other'];
+    groups.forEach(g => {
+      if(!grouped[g]) grouped[g] = [];
+      grouped[g].push(s);
+    });
+  });
+  const groupOrder = Object.keys(STORY_GROUPS).sort((a,b) => STORY_GROUPS[a].order - STORY_GROUPS[b].order);
+  let html = '';
+  groupOrder.forEach(g => {
+    const items = grouped[g] || [];
+    if(!items.length) return;
+    html += `
+      <div class="story-group">
+        <div class="story-group-title">
+          ${esc(STORY_GROUPS[g].label)}
+          <span class="story-group-count">${items.length}</span>
+        </div>
+        <div class="grid">
+          ${items.map(s => `
+            <div class="card" onclick="openStory('${s.id}')">
+              <button class="btn-del" onclick="event.stopPropagation();deleteStory('${s.id}')">✕</button>
+              <h3>${esc(s.title)}</h3>
+              ${(s.tags||[]).length ? `<div class="tags">${(s.tags||[]).map(t=>`<span class="tag ${t==='18+'?'plus':''}">${esc(t)}</span>`).join('')}</div>` : ''}
+              <div class="card-actions">
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openStoryEdit('${s.id}')">Изменить</button>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html || '<div class="empty">Пусто</div>';
+}
+let _currentStoryId = null;
+function openStory(id){
+  const s = DB.stories.find(x=>x.id===id); if(!s) return;
+  _currentStoryId = id;
+  const groups = Array.isArray(s.groups) ? s.groups : (s.group ? [s.group] : []);
+  const groupTags = groups.map(g => STORY_GROUPS[g] ? `<span class="tag">${esc(STORY_GROUPS[g].label)}</span>` : '').join(' ');
+  document.getElementById('storyTitle').textContent = s.title;
+  document.getElementById('storyMeta').innerHTML = groupTags + (s.tags||[]).map(t=>`<span class="tag ${t==='18+'?'plus':''}">${esc(t)}</span>`).join(' ');
+  const box = document.getElementById('storyText');
+  if((s.tags||[]).includes('18+')){
+    box.innerHTML = `<div style="text-align:center;padding:36px 12px">
+      <div style="color:var(--muted);margin-bottom:16px;font-size:14px">Текст 18+. Нажми, если хочешь показать.</div>
+      <button class="btn" id="show18">Показать</button>
+    </div>`;
+    document.getElementById('show18').onclick = () => { box.innerHTML = esc(s.text); };
+  } else { box.innerHTML = esc(s.text); }
+  document.getElementById('storyModalEditBtn').onclick = () => openStoryEdit(id);
+  document.getElementById('storyModal').classList.add('active');
+}
+function openStoryEdit(id){
+  const s = id ? DB.stories.find(x=>x.id===id) : null;
+  document.getElementById('storyEditTitle').textContent = s ? 'Редактировать аушку' : 'Новая аушка';
+  document.getElementById('storyEditId').value = s ? s.id : '';
+  document.getElementById('storyEditName').value = s ? (s.title || '') : '';
+  document.getElementById('storyEditTags').value = s ? (s.tags||[]).join(', ') : '';
+  document.getElementById('storyEditText').value = s ? (s.text || '') : '';
+  const sGroups = s
+    ? (Array.isArray(s.groups) ? s.groups : (s.group ? [s.group] : []))
+    : [];
+  document.querySelectorAll('#storyEditGroups input[type="checkbox"]').forEach(cb => {
+    cb.checked = sGroups.includes(cb.value);
+  });
+  const delBtn = document.getElementById('storyEditDeleteBtn');
+  if(s){ delBtn.style.display = ''; delBtn.onclick = () => { closeModal('storyEditModal'); deleteStory(id); }; }
+  else { delBtn.style.display = 'none'; }
+  closeModal('storyModal');
+  document.getElementById('storyEditModal').classList.add('active');
+}
+function saveStoryEdit(){
+  const title = document.getElementById('storyEditName').value.trim();
+  if(!title) return alert('Введи название');
+  const groups = [];
+  document.querySelectorAll('#storyEditGroups input[type="checkbox"]').forEach(cb => {
+    if(cb.checked) groups.push(cb.value);
+  });
+  if(!groups.length) groups.push('other');
+  const data = {
+    id: document.getElementById('storyEditId').value || uid(),
+    title,
+    groups,
+    tags: document.getElementById('storyEditTags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    text: document.getElementById('storyEditText').value
+  };
+  const i = DB.stories.findIndex(x => x.id === data.id);
+  if(i >= 0) DB.stories[i] = data; else DB.stories.push(data);
+  save(); renderStories(); updateCounts(); closeModal('storyEditModal');
+}
+function deleteStory(id){
+  const s = DB.stories.find(x=>x.id===id);
+  if(!s) return;
+  if(!confirm(`Удалить «${s.title}»?`)) return;
+  DB.stories = DB.stories.filter(x => x.id !== id);
+  save(); renderStories(); updateCounts();
+}
+
+let watchFilter = "all";
+let watchTypeFilter = "all";
+function renderWatch(){
+  const list = document.getElementById('watchList');
+  document.querySelectorAll('[data-wtype]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.wtype === watchTypeFilter);
+    b.onclick = () => { watchTypeFilter = b.dataset.wtype; renderWatch(); };
+  });
+  document.querySelectorAll('[data-wfilter]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.wfilter === watchFilter);
+    b.onclick = () => { watchFilter = b.dataset.wfilter; renderWatch(); };
+  });
+  let items = DB.watch;
+  if(watchTypeFilter !== 'all'){
+    items = items.filter(w => {
+      let tp = w.type || 'other';
+      if(tp === 'anime') tp = 'cartoon';
+      return tp === watchTypeFilter;
+    });
+  }
+  if(watchFilter === 'todo') items = items.filter(w=>!w.done);
+  if(watchFilter === 'done') items = items.filter(w=>w.done);
+  if(!items.length){ list.innerHTML='<div class="empty">Пусто</div>'; return; }
+  const t = {film:'Фильм', series:'Сериал', cartoon:'Мультфильм', other:'Другое', anime:'Мультфильм'};
+  list.innerHTML = items.map(w=>`
+    <div class="watch-item ${w.done?'done':''}">
+      <div class="check ${w.done?'on':''}" onclick="toggleWatch('${w.id}')">✓</div>
+      <div class="watch-info">
+        <div class="watch-title">${esc(w.title)}</div>
+        <div class="watch-meta">${t[w.type]||'Другое'}</div>
+      </div>
+      <button class="btn-del" style="position:static;opacity:1" onclick="delWatch('${w.id}')">✕</button>
+    </div>`).join('');
+}
+function toggleWatch(id){ const w = DB.watch.find(x=>x.id===id); w.done=!w.done; save(); renderWatch(); updateCounts(); }
+function openWatchModal(){ document.getElementById('watchTitle').value=''; document.getElementById('watchType').value='film'; document.getElementById('watchModal').classList.add('active'); }
+function saveWatch(){
+  const title = document.getElementById('watchTitle').value.trim();
+  if(!title) return alert('Название');
+  DB.watch.push({ id: uid(), title, type: document.getElementById('watchType').value, done:false });
+  save(); renderWatch(); updateCounts(); closeModal('watchModal');
+}
+function delWatch(id){ if(!confirm('Удалить?'))return; DB.watch = DB.watch.filter(w=>w.id!==id); save(); renderWatch(); updateCounts(); }
+
+function updateCounts(){
+  document.getElementById('navChars').textContent = DB.chars.length;
+  document.getElementById('navFam').textContent = DB.families.length;
+  document.getElementById('navTrees').textContent = DB.trees.length;
+  document.getElementById('navMatrix').textContent = Object.keys(DB.matrix).length;
+  document.getElementById('navFics').textContent = DB.fics.length;
+  document.getElementById('navStories').textContent = DB.stories.length;
+  document.getElementById('navWatch').textContent = DB.watch.filter(w=>!w.done).length;
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `test-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+function importData(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try{
+      const d = JSON.parse(ev.target.result);
+      if(d.chars) DB.chars = d.chars;
+      if(d.families) DB.families = d.families;
+      if(d.watch) DB.watch = d.watch;
+      if(d.fics) DB.fics = d.fics;
+      if(d.matrix) DB.matrix = d.matrix;
+      if(d.matrixCols) DB.matrixCols = d.matrixCols;
+      if(d.trees) DB.trees = d.trees;
+      if(d.stories) DB.stories = d.stories.map(migrateStory);
+      save(); renderAll(); alert('Импортировано');
+    }catch{ alert('Ошибка файла'); }
+  };
+  r.readAsText(f);
+}
+
+document.querySelectorAll('.modal').forEach(m=>{
+  m.onclick = e => { if(e.target === m) m.classList.remove('active'); };
+});
+
+const dropZone = document.getElementById('dropZone');
+const treeInput = document.getElementById('treeInput');
+dropZone.onclick = () => treeInput.click();
+treeInput.onchange = e => handleTreeFiles(e.target.files);
+dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
+dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+dropZone.ondrop = e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  handleTreeFiles(e.dataTransfer.files);
+};
+
+function renderAll(){
+  renderChars(); renderFamilies(); renderTrees(); renderPickers(); renderMatrix();
+  renderFics(); renderStories(); renderWatch(); updateCounts(); updateHint();
+  document.querySelectorAll('.zoom-btn').forEach(b => {
+    b.onclick = () => setMatrixSize(b.dataset.size);
+  });
+  setMatrixSize(matrixSize);
+}
+
+// ============================================
+// СТАРТ
+// ============================================
+async function init(){
+  initTheme();
+
+  // Сначала загружаем локальные — чтобы сайт сразу показал что-то
+  DB = loadFromLocal();
+  renderAll();
+  setSyncStatus("loading");
+
+  // Потом синхронизируемся с облаком
+  await syncLoop();
+
+  // Дальше — цикл обновлений каждые N секунд
+  setInterval(syncLoop, SYNC_INTERVAL);
+}
+
+init();
+</script>
+</body>
+</html>
